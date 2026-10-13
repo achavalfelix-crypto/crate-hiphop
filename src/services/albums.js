@@ -60,11 +60,13 @@ export function agregarAlbum(uid, datos) {
   });
 }
 
-// MODIFICAR: recibe el disco completo y los cambios.
-// Se reescriben todos los campos para que los discos de la v1 queden con el formato nuevo.
+// MODIFICAR: recibe la entrada completa (disco o canción) y los cambios.
+// Se reescriben todos los campos para que lo guardado con versiones anteriores quede con el formato nuevo.
 export function actualizarAlbum(uid, album, cambios) {
-  const { title, artist, year, coast, status, rating, tracks } = album;
+  const { type, album: deAlbum, title, artist, year, coast, status, rating, tracks } = album;
   return updateDoc(albumRef(uid, album.id), {
+    type,
+    album: deAlbum,
     title,
     artist,
     year,

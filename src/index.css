@@ -666,3 +666,56 @@ select {
     animation: none;
   }
 }
+
+/* ───────── v4: canciones sueltas ───────── */
+.bloque.tipo-cancion {
+  height: 7px;
+}
+.bloque-muestra-cancion {
+  height: 6px;
+  margin-left: 8px;
+}
+.portada.tipo-cancion {
+  border-radius: 50%;
+}
+.portada.tipo-cancion .portada-anio {
+  display: none;
+}
+.portada.tipo-cancion .portada-inicial {
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-54%);
+  text-align: center;
+}
+.album-de {
+  font-size: 0.875rem;
+  color: var(--gris);
+}
+.album-de em {
+  font-style: italic;
+}
+.contador {
+  white-space: nowrap;
+}
+.fila-tipo {
+  flex-basis: 100%;
+}
+.segmentado .chip-num {
+  margin-left: 2px;
+}
+@media (max-width: 720px) {
+  .bloque.tipo-cancion {
+    height: 5px;
+  }
+  .fila-tipo .segmentado {
+    width: 100%;
+  }
+  .contador {
+    font-size: 0.875rem;
+    line-height: 1.15;
+  }
+  .contador strong {
+    font-size: 1.125rem;
+  }
+}

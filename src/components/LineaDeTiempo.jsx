@@ -2,7 +2,7 @@ import { ANIO_MAX, ANIO_MIN, nombreEstado } from '../data/constantes';
 
 const ANIOS = Array.from({ length: ANIO_MAX - ANIO_MIN + 1 }, (_, i) => ANIO_MIN + i);
 
-// Cada disco es un bloque apilado sobre su año.
+// Cada disco o canción es un bloque apilado sobre su año (las canciones, más bajos).
 // Color = costa. Relleno = escuchado, rayado = escuchando, contorno = por escuchar.
 export default function LineaDeTiempo({ albums, anioActivo, onElegirAnio }) {
   const porAnio = {};
@@ -21,12 +21,12 @@ export default function LineaDeTiempo({ albums, anioActivo, onElegirAnio }) {
               className={`linea-anio ${activo ? 'activo' : ''}`}
               disabled={lista.length === 0}
               aria-pressed={activo}
-              aria-label={`${anio}: ${lista.length} ${lista.length === 1 ? 'disco' : 'discos'}`}
+              aria-label={`${anio}: ${lista.length} ${lista.length === 1 ? 'entrada' : 'entradas'}`}
               title={lista.length ? `${anio}\n${lista.map((a) => `${a.title} (${nombreEstado(a.status)})`).join('\n')}` : `${anio}`}
               onClick={() => onElegirAnio(activo ? null : anio)}
             >
               {lista.map((a) => (
-                <span key={a.id} className={`bloque costa-${a.coast} estado-${a.status}`} />
+                <span key={a.id} className={`bloque costa-${a.coast} estado-${a.status} tipo-${a.type}`} />
               ))}
             </button>
           );

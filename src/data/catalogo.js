@@ -26,4 +26,4 @@ export const CATALOGO = [
   { title: 'Finally Rich', artist: 'Chief Keef', year: 2012, coast: 'midwest', tracks: t('Love Sosa') },
   { title: 'My Krazy Life', artist: 'YG', year: 2014, coast: 'west', tracks: t('Who Do You Love?') },
   { title: "Summertime '06", artist: 'Vince Staples', year: 2015, coast: 'west', tracks: t('Norf Norf') },
-].map((a) => ({ ...a, status: 'pendiente', rating: 0 }));
+].map((a) => ({ ...a, type: 'album', album: '', status: 'pendiente', rating: 0 }));

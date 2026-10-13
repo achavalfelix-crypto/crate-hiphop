@@ -14,13 +14,20 @@ export const ESTADOS = [
   { id: 'escuchado', nombre: 'Escuchado' },
 ];
 
+export const TIPOS = [
+  { id: 'album', nombre: 'Disco', plural: 'Discos' },
+  { id: 'cancion', nombre: 'Canción', plural: 'Canciones' },
+];
+
 export const nombreCosta = (id) => COSTAS.find((c) => c.id === id)?.nombre ?? '—';
 export const nombreEstado = (id) => ESTADOS.find((e) => e.id === id)?.nombre ?? '—';
 
-// Completa los campos que faltan (por ejemplo, discos guardados con la v1).
+// Completa los campos que faltan (por ejemplo, discos guardados con versiones anteriores).
 export function normalizar(a) {
   return {
     ...a,
+    type: a.type ?? 'album',
+    album: a.album ?? '',
     coast: a.coast ?? 'east',
     status: a.status ?? (a.escuchado ? 'escuchado' : 'pendiente'),
     rating: a.rating ?? 0,

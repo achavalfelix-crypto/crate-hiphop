@@ -1,17 +1,17 @@
 # Crate — rap gangster 1980–2016
 
-Aplicación web para armar tu propio cajón de discos de rap gangster de Estados Unidos, de 1980 a 2016. Registrás discos y canciones, marcás qué escuchaste, puntuás y ves tu colección ordenada en una línea de tiempo por año y por costa.
+Aplicación web para armar tu propio cajón de discos y canciones de rap gangster de Estados Unidos, de 1980 a 2016. Registrás discos y canciones sueltas, marcás qué escuchaste, puntuás y ves tu colección ordenada en una línea de tiempo por año y por costa.
 
 **TP2 — Desarrollo Frontend II (UADE, FADI).** React + Vite, Cloud Firestore y despliegue en Vercel.
 
 ## Funciones
 
-- Agregar, editar y eliminar discos (título, artista, año, costa).
+- Agregar, editar y eliminar discos y canciones sueltas (título, artista, año, costa; las canciones pueden indicar de qué disco son).
 - Cambiar el estado de cada disco: por escuchar, escuchando o escuchado.
 - Puntaje de 0 a 5 estrellas.
-- Canciones por disco: agregar, quitar y marcar favoritas.
-- Línea de tiempo 1980–2016: cada disco es un bloque en su año, con el color de su costa y el relleno según su estado. Tocar un año filtra la lista.
-- Búsqueda por disco, artista o canción, y filtros por costa y estado.
+- Lista de canciones dentro de cada disco: agregar, quitar y marcar favoritas.
+- Línea de tiempo 1980–2016: cada disco o canción es un bloque en su año (las canciones, más bajos), con el color de su costa y el relleno según su estado. Tocar un año filtra la lista.
+- Búsqueda por disco, canción o artista, y filtros por tipo, costa y estado.
 - Catálogo inicial opcional de 23 discos clave, para no arrancar con el cajón vacío.
 - Mensajes de carga, éxito y error en cada operación.
 
@@ -23,21 +23,23 @@ Aplicación web para armar tu propio cajón de discos de rap gangster de Estados
 
 ## Datos en Firestore
 
-Cada visitante entra con un usuario anónimo. Sus discos se guardan en:
+Cada visitante entra con un usuario anónimo. Sus discos y canciones se guardan en:
 
 ```
 users/{uid}/albums/{albumId}
+  type: string         // album | cancion
+  album: string        // de qué disco es la canción (opcional)
   title: string        // "Illmatic"
   artist: string       // "Nas"
   year: number         // 1980–2016
   coast: string        // west | east | south | midwest
   status: string       // pendiente | escuchando | escuchado
   rating: number       // 0–5
-  tracks: [{ id, title, fav }]
+  tracks: [{ id, title, fav }]   // canciones del disco (vacío en las canciones sueltas)
   createdAt, updatedAt // fecha del servidor
 ```
 
-Las reglas (`firestore.rules`) solo dejan que cada usuario lea y modifique sus propios discos, y validan los campos antes de guardar.
+Las reglas (`firestore.rules`) solo dejan que cada usuario lea y modifique lo suyo, y validan los campos antes de guardar.
 
 ## Ejecutar en local
 
@@ -90,5 +92,6 @@ firestore.rules          reglas de seguridad
 - **v1.0** — Primera versión funcional: agregar, listar, marcar escuchado y eliminar.
 - **v2.0** — Costa, tres estados, puntaje, canciones, filtros, edición, avisos y reglas con validación.
 - **v3.0** — Diseño final, línea de tiempo, búsqueda, catálogo inicial, confirmación al eliminar y versión para celular.
+- **v4.0** — Canciones sueltas además de discos: selector Disco/Canción, filtro por tipo, portada redonda y bloque bajo en la línea de tiempo.
 
 Las portadas son generadas con tipografía (color de la costa + inicial). No se usan tapas reales.

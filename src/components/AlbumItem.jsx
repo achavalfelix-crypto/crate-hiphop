@@ -5,11 +5,13 @@ import Canciones from './Canciones';
 import Portada from './Portada';
 import Puntaje from './Puntaje';
 
+// Una fila de la lista: puede ser un disco (con sus canciones) o una canción suelta.
 export default function AlbumItem({ album, onActualizar, onEliminar }) {
   const [abierto, setAbierto] = useState(false);
   const [editando, setEditando] = useState(false);
   const [confirmando, setConfirmando] = useState(false);
 
+  const esCancion = album.type === 'cancion';
   const actualizar = (cambios) => onActualizar(album, cambios);
   const favoritas = album.tracks.filter((t) => t.fav).length;
 
@@ -31,7 +33,7 @@ export default function AlbumItem({ album, onActualizar, onEliminar }) {
   }
 
   return (
-    <li className={`album estado-${album.status}`}>
+    <li className={`album estado-${album.status} tipo-${album.type}`}>
       <Portada album={album} />
 
       <div className="album-cuerpo">
@@ -40,8 +42,13 @@ export default function AlbumItem({ album, onActualizar, onEliminar }) {
           <p className="album-artista">{album.artist}</p>
           <p className="album-meta">
             <span className={`muestra costa-${album.coast}`} />
-            {nombreCosta(album.coast)}, {album.year}
+            {esCancion ? 'Canción' : 'Disco'}, {nombreCosta(album.coast)}, {album.year}
           </p>
+          {esCancion && album.album && (
+            <p className="album-de">
+              Del disco <em>{album.album}</em>
+            </p>
+          )}
         </div>
 
         <div className="album-controles">
@@ -61,21 +68,23 @@ export default function AlbumItem({ album, onActualizar, onEliminar }) {
         </div>
 
         <div className="album-acciones">
-          <button
-            type="button"
-            className="btn-texto"
-            aria-expanded={abierto}
-            onClick={() => setAbierto(!abierto)}
-          >
-            {abierto ? 'Ocultar canciones' : 'Canciones'} ({album.tracks.length}
-            {favoritas ? `, ${favoritas} ♥` : ''})
-          </button>
+          {!esCancion && (
+            <button
+              type="button"
+              className="btn-texto"
+              aria-expanded={abierto}
+              onClick={() => setAbierto(!abierto)}
+            >
+              {abierto ? 'Ocultar canciones' : 'Canciones'} ({album.tracks.length}
+              {favoritas ? `, ${favoritas} ♥` : ''})
+            </button>
+          )}
           <button type="button" className="btn-texto" onClick={() => setEditando(true)}>
             Editar
           </button>
           {confirmando ? (
             <span className="confirmar" role="group" aria-label="Confirmar eliminación">
-              ¿Eliminar este disco?
+              {esCancion ? '¿Eliminar esta canción?' : '¿Eliminar este disco?'}
               <button type="button" className="btn-texto peligro" onClick={() => onEliminar(album)}>
                 Sí, eliminar
               </button>
@@ -90,7 +99,9 @@ export default function AlbumItem({ album, onActualizar, onEliminar }) {
           )}
         </div>
 
-        {abierto && <Canciones tracks={album.tracks} onCambiar={(tracks) => actualizar({ tracks })} />}
+        {abierto && !esCancion && (
+          <Canciones tracks={album.tracks} onCambiar={(tracks) => actualizar({ tracks })} />
+        )}
       </div>
     </li>
   );

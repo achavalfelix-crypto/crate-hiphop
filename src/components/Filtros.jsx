@@ -1,7 +1,7 @@
-import { COSTAS, ESTADOS } from '../data/constantes';
+import { COSTAS, ESTADOS, TIPOS } from '../data/constantes';
 
-// Buscador + costas (que también funcionan como leyenda de colores) + estado.
-export default function Filtros({ filtros, onCambiar, conteoCostas }) {
+// Buscador + tipo + costas (que también funcionan como leyenda de colores) + estado.
+export default function Filtros({ filtros, onCambiar, conteoCostas, conteoTipos }) {
   const set = (campo, valor) => onCambiar({ ...filtros, [campo]: valor });
 
   return (
@@ -9,11 +9,27 @@ export default function Filtros({ filtros, onCambiar, conteoCostas }) {
       <input
         type="search"
         className="buscador"
-        aria-label="Buscar por disco, artista o canción"
-        placeholder="Buscar disco, artista o canción"
+        aria-label="Buscar por disco, canción o artista"
+        placeholder="Buscar disco, canción o artista"
         value={filtros.texto}
         onChange={(e) => set('texto', e.target.value)}
       />
+
+      <div className="segmentado" role="group" aria-label="Filtrar por tipo">
+        <button type="button" aria-pressed={!filtros.tipo} onClick={() => set('tipo', '')}>
+          Todo
+        </button>
+        {TIPOS.map((t) => (
+          <button
+            key={t.id}
+            type="button"
+            aria-pressed={filtros.tipo === t.id}
+            onClick={() => set('tipo', t.id)}
+          >
+            {t.plural} <span className="chip-num">{conteoTipos[t.id] ?? 0}</span>
+          </button>
+        ))}
+      </div>
 
       <div className="chips" role="group" aria-label="Filtrar por costa">
         {COSTAS.map((c) => {

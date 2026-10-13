@@ -17,7 +17,7 @@ import {
   iniciarSesion,
 } from './services/albums';
 
-const SIN_FILTROS = { texto: '', costa: '', estado: '', anio: null };
+const SIN_FILTROS = { texto: '', tipo: '', costa: '', estado: '', anio: null };
 
 export default function App() {
   const [uid, setUid] = useState(null);
@@ -29,7 +29,7 @@ export default function App() {
   const [formAbierto, setFormAbierto] = useState(false);
   const formRef = useRef(null);
 
-  // 1) Inicia sesión anónima. 2) Escucha los discos del usuario en tiempo real.
+  // 1) Inicia sesión anónima. 2) Escucha los discos y canciones del usuario en tiempo real.
   useEffect(() => {
     let cortar = () => {};
     iniciarSesion()
@@ -42,7 +42,7 @@ export default function App() {
             setCargando(false);
           },
           () => {
-            setErrorCarga('No se pudieron cargar los discos. Revisá la conexión y recargá la página.');
+            setErrorCarga('No se pudo cargar tu cajón. Revisá la conexión y recargá la página.');
             setCargando(false);
           },
         );
@@ -83,12 +83,14 @@ export default function App() {
     const q = filtros.texto.trim().toLowerCase();
     return albums.filter(
       (a) =>
+        (!filtros.tipo || a.type === filtros.tipo) &&
         (!filtros.costa || a.coast === filtros.costa) &&
         (!filtros.estado || a.status === filtros.estado) &&
         (!filtros.anio || a.year === filtros.anio) &&
         (!q ||
           a.title.toLowerCase().includes(q) ||
           a.artist.toLowerCase().includes(q) ||
+          a.album.toLowerCase().includes(q) ||
           a.tracks.some((t) => t.title.toLowerCase().includes(q))),
     );
   }, [albums, filtros]);
@@ -99,6 +101,14 @@ export default function App() {
     return c;
   }, [albums]);
 
+  const conteoTipos = useMemo(() => {
+    const c = {};
+    albums.forEach((a) => (c[a.type] = (c[a.type] ?? 0) + 1));
+    return c;
+  }, [albums]);
+
+  const discos = conteoTipos.album ?? 0;
+  const canciones = conteoTipos.cancion ?? 0;
   const escuchados = albums.filter((a) => a.status === 'escuchado').length;
   const vacio = !cargando && !errorCarga && albums.length === 0;
 
@@ -111,7 +121,9 @@ export default function App() {
         </div>
         {albums.length > 0 && (
           <p className="contador">
-            <strong>{albums.length}</strong> {albums.length === 1 ? 'disco' : 'discos'}
+            <strong>{discos}</strong> {discos === 1 ? 'disco' : 'discos'}
+            <br />
+            <strong>{canciones}</strong> {canciones === 1 ? 'canción' : 'canciones'}
             <br />
             <strong>{escuchados}</strong> {escuchados === 1 ? 'escuchado' : 'escuchados'}
           </p>
@@ -128,6 +140,7 @@ export default function App() {
           <span className="bloque-muestra estado-escuchado" /> Escuchado
           <span className="bloque-muestra estado-escuchando" /> Escuchando
           <span className="bloque-muestra estado-pendiente" /> Por escuchar
+          <span className="bloque-muestra bloque-muestra-cancion estado-escuchado" /> Canción (bloque bajo)
           <span className="leyenda-ayuda">Tocá un año para filtrarlo.</span>
         </p>
       </section>
@@ -159,10 +172,15 @@ export default function App() {
 
             {!vacio && (
               <div className="barra">
-                <Filtros filtros={filtros} onCambiar={setFiltros} conteoCostas={conteoCostas} />
+                <Filtros
+                  filtros={filtros}
+                  onCambiar={setFiltros}
+                  conteoCostas={conteoCostas}
+                  conteoTipos={conteoTipos}
+                />
                 {!formAbierto && (
                   <button type="button" className="btn btn-primario" onClick={abrirForm}>
-                    Agregar disco
+                    Agregar
                   </button>
                 )}
               </div>
@@ -170,15 +188,15 @@ export default function App() {
 
             {formAbierto && (
               <section className="panel-form" aria-labelledby="titulo-agregar" ref={formRef}>
-                <h2 id="titulo-agregar">Agregar disco</h2>
+                <h2 id="titulo-agregar">Agregar al cajón</h2>
                 <AlbumForm
                   deshabilitado={!uid}
                   onCancelar={() => setFormAbierto(false)}
                   onGuardar={(datos) =>
                     ejecutar(
                       () => agregarAlbum(uid, { ...datos, status: 'pendiente', rating: 0, tracks: [] }),
-                      `“${datos.title}” agregado.`,
-                      'No se pudo agregar el disco. Probá de nuevo.',
+                      `“${datos.title}” ${datos.type === 'cancion' ? 'agregada' : 'agregado'}.`,
+                      'No se pudo agregar. Probá de nuevo.',
                     )
                   }
                 />
@@ -208,8 +226,8 @@ export default function App() {
                 onEliminar={(album) =>
                   ejecutar(
                     () => eliminarAlbum(uid, album.id),
-                    `“${album.title}” eliminado.`,
-                    'No se pudo eliminar el disco.',
+                    `“${album.title}” ${album.type === 'cancion' ? 'eliminada' : 'eliminado'}.`,
+                    'No se pudo eliminar.',
                   )
                 }
               />
@@ -219,7 +237,7 @@ export default function App() {
       </main>
 
       <footer className="pie">
-        <p>Tus discos se guardan en Firebase y solo los ves vos, en este navegador.</p>
+        <p>Tus discos y canciones se guardan en Firebase y solo los ves vos, en este navegador.</p>
       </footer>
 
       <Aviso aviso={aviso} onCerrar={cerrarAviso} />
