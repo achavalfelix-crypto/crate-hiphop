@@ -1,6 +1,6 @@
-import { formatoDuracion, formatoVistas, linkEscuchar } from '../services/youtube';
+import { formatoDuracion, formatoVistas } from '../services/youtube';
 
-// Duración + reproducciones en vivo de un video, y link para escucharlo.
+// Duración + reproducciones en vivo de un video (se escucha con el botón ▶ de la página).
 export default function DatosYouTube({ videoId, datos, compacto = false }) {
   if (!videoId) return null;
   const d = datos[videoId];
@@ -16,9 +16,6 @@ export default function DatosYouTube({ videoId, datos, compacto = false }) {
           </span>
         </>
       )}
-      <a className="yt-link" href={linkEscuchar(videoId)} target="_blank" rel="noreferrer">
-        Escuchar
-      </a>
     </span>
   );
 }

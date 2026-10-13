@@ -9,6 +9,8 @@ import useWiki from '../hooks/useWiki';
 import { transicion } from '../hooks/foco';
 import { link } from '../hooks/useRuta';
 import { agregarAlbum, iniciarSesion } from '../services/albums';
+import { useReproductor } from '../services/reproductor';
+import { albumSpotify } from '../services/spotify';
 
 // Botón que guarda el disco en "Mi cajón" (Firestore).
 function AgregarAlCajon({ d }) {
@@ -17,9 +19,14 @@ function AgregarAlCajon({ d }) {
     setEstado('guardando');
     try {
       const uid = await iniciarSesion();
+      // Si Spotify tiene el disco, se guarda con todas sus canciones (listas para escuchar desde el cajón).
+      const sp = await albumSpotify(d.titulo, autorDe(d), d.anio).catch(() => null);
+      const tracks = (sp?.canciones ?? []).slice(0, 60).map((c) => ({
+        id: crypto.randomUUID(), title: c.nombre, fav: false, spotifyId: c.id,
+      }));
       await agregarAlbum(uid, {
-        type: 'album', album: '', videoId: '', title: d.titulo, artist: autorDe(d),
-        year: d.anio, coast: d.costa, status: 'pendiente', rating: 0, tracks: [],
+        type: 'album', album: '', videoId: '', spotifyId: sp?.id ?? '', favorita: false, title: d.titulo,
+        artist: autorDe(d), year: d.anio, coast: d.costa, status: 'pendiente', rating: 0, tracks,
       });
       setEstado('ok');
     } catch {
@@ -46,7 +53,8 @@ function AgregarAlCajon({ d }) {
 export default function Album({ id }) {
   const d = albumPorId(id);
   const { estado, datos } = useWiki(d?.wiki);
-  const [girando, setGirando] = useState(false);
+  const pista = useReproductor();
+  const girando = pista?.fuente === 'spotify' && pista.discoId === d?.id;
 
   if (!d) {
     return (
@@ -56,7 +64,6 @@ export default function Album({ id }) {
     );
   }
   const mas = ALBUMES.filter((x) => x.artista === d.artista && x.id !== d.id);
-  const busqueda = `https://music.youtube.com/search?q=${encodeURIComponent(`${autorDe(d)} ${d.titulo}`)}`;
 
   return (
     <div className="pagina">
@@ -68,7 +75,7 @@ export default function Album({ id }) {
             <div className="tapa" style={transicion('alb', d.id)}>
               <ImagenWiki wiki={d.wiki} alt={`Tapa de ${d.titulo}`} grande respaldo={{ title: d.titulo, coast: d.costa, year: d.anio }} />
             </div>
-            <p className="funda-ayuda">{girando ? 'Sonando…' : 'Tocá un tema de la lista y el disco gira.'}</p>
+            <p className="funda-ayuda">{girando ? 'Sonando…' : 'Dale play y el disco gira.'}</p>
           </div>
         </div>
         <div className="detalle-cuerpo">
@@ -83,14 +90,11 @@ export default function Album({ id }) {
 
           <div className="acciones-detalle">
             <AgregarAlCajon d={d} />
-            <a className="btn" href={busqueda} target="_blank" rel="noreferrer">
-              Escuchar en YouTube Music
-            </a>
           </div>
 
           <section aria-labelledby="t-escuchar">
             <h2 id="t-escuchar">Escuchalo entero</h2>
-            <DiscoSpotify disco={d} autor={autorDe(d)} onSonando={setGirando} />
+            <DiscoSpotify disco={d} autor={autorDe(d)} />
           </section>
 
           <section aria-labelledby="t-resena">

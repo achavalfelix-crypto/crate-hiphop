@@ -50,6 +50,15 @@ export default function Filtros({ filtros, onCambiar, conteoCostas, conteoTipos 
         })}
       </div>
 
+      <button
+        type="button"
+        className={`chip chip-fav ${filtros.favoritas ? 'activo' : ''}`}
+        aria-pressed={Boolean(filtros.favoritas)}
+        onClick={() => set('favoritas', !filtros.favoritas)}
+      >
+        ♥ Favoritas
+      </button>
+
       <div className="segmentado" role="group" aria-label="Filtrar por estado">
         <button type="button" aria-pressed={!filtros.estado} onClick={() => set('estado', '')}>
           Todos

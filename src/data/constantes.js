@@ -29,6 +29,8 @@ export function normalizar(a) {
     type: a.type ?? 'album',
     album: a.album ?? '',
     videoId: a.videoId ?? '',
+    spotifyId: a.spotifyId ?? '',
+    favorita: a.favorita ?? false,
     coast: a.coast ?? 'east',
     status: a.status ?? (a.escuchado ? 'escuchado' : 'pendiente'),
     rating: a.rating ?? 0,

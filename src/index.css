@@ -1900,3 +1900,165 @@ body::after {
   z-index: 1;
   background: none;
 }
+
+/* ═════════ v10: reproductor de la página, favoritas y app ═════════ */
+.reproductor {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+  background: rgba(14, 13, 12, 0.94);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid var(--linea);
+  padding: 8px 16px calc(8px + env(safe-area-inset-bottom));
+  color: var(--hueso);
+  animation: subir 0.3s ease-out both;
+}
+.reproductor-interior {
+  max-width: 1040px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.reproductor-cuerpo {
+  flex: 1;
+  min-width: 0;
+}
+.reproductor-spotify iframe {
+  display: block;
+  width: 100%;
+  border: 0;
+  border-radius: 12px;
+}
+.reproductor-spotify {
+  min-height: 80px;
+}
+.reproductor-youtube {
+  display: block;
+  width: 356px;
+  max-width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 0;
+  border-radius: 8px;
+  background: #000;
+}
+.reproductor-aviso {
+  padding: 18px 4px;
+  font-weight: 600;
+}
+.reproductor-cerrar {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--linea);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--hueso);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.reproductor-cerrar:hover {
+  background: rgba(241, 235, 224, 0.1);
+}
+/* Que el reproductor no tape el final de la página */
+body.con-reproductor {
+  padding-bottom: calc(110px + env(safe-area-inset-bottom));
+}
+body.con-reproductor:has(.fuente-youtube) {
+  padding-bottom: calc(230px + env(safe-area-inset-bottom));
+}
+
+/* Botón ▶ */
+.btn-play {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 6px 14px 6px 10px;
+  border: 1px solid var(--oro);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--tinta);
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-play:hover,
+.btn-play.sonando {
+  background: var(--oro);
+  color: var(--negro);
+}
+.btn-play-chico {
+  flex: none;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  font-size: 0.8rem;
+}
+.album-play {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+.cancion-fila {
+  gap: 8px;
+}
+.spotify-cabeza {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.spotify-cabeza .nota-fuente {
+  margin: 0;
+}
+
+/* Favoritas */
+.btn-corazon {
+  margin-left: 8px;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--gris);
+  font-size: 1.25rem;
+  line-height: 1;
+  vertical-align: middle;
+  cursor: pointer;
+}
+.btn-corazon:hover {
+  background: rgba(241, 235, 224, 0.1);
+}
+.btn-corazon.activo {
+  color: #ff5a6e;
+}
+.chip-fav.activo {
+  background: #ff5a6e;
+  border-color: #ff5a6e;
+  color: var(--negro);
+}
+
+/* Botón para instalar la app */
+.instalar {
+  margin-top: 10px;
+}
+
+@media (max-width: 720px) {
+  .reproductor {
+    padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
+  }
+  .reproductor-youtube {
+    width: 100%;
+  }
+  .album-controles {
+    width: 100%;
+  }
+}

@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { ESTADOS, nombreCosta } from '../data/constantes';
 import AlbumForm from './AlbumForm';
+import BotonPlay from './BotonPlay';
+import { reproducir } from '../services/reproductor';
 import Canciones from './Canciones';
 import DatosYouTube from './DatosYouTube';
 import { formatoDuracion } from '../services/youtube';
@@ -42,7 +44,18 @@ export default function AlbumItem({ album, onActualizar, onEliminar, yt = {} }) 
 
       <div className="album-cuerpo">
         <div className="album-datos">
-          <h3>{album.title}</h3>
+          <h3>
+            {album.title}
+            <button
+              type="button"
+              className={`btn-corazon ${album.favorita ? 'activo' : ''}`}
+              aria-pressed={album.favorita}
+              aria-label={album.favorita ? `Quitar ${album.title} de favoritas` : `Marcar ${album.title} como favorita`}
+              onClick={() => actualizar({ favorita: !album.favorita })}
+            >
+              {album.favorita ? '♥' : '♡'}
+            </button>
+          </h3>
           <p className="album-artista">{album.artist}</p>
           <p className="album-meta">
             <span className={`muestra costa-${album.coast}`} />
@@ -53,7 +66,31 @@ export default function AlbumItem({ album, onActualizar, onEliminar, yt = {} }) 
               Del disco <em>{album.album}</em>
             </p>
           )}
-          {esCancion && <DatosYouTube videoId={album.videoId} datos={yt} />}
+          {esCancion && (
+            <div className="album-play">
+              <BotonPlay
+                titulo={album.title}
+                artista={album.artist}
+                spotifyId={album.spotifyId}
+                videoId={album.videoId}
+                onEncontrada={(spotifyId) => actualizar({ spotifyId })}
+              />
+              <DatosYouTube videoId={album.videoId} datos={yt} />
+            </div>
+          )}
+          {!esCancion && album.spotifyId && (
+            <div className="album-play">
+              <button
+                type="button"
+                className="btn-play"
+                onClick={() =>
+                  reproducir({ fuente: 'spotify', tipo: 'album', id: album.spotifyId, titulo: album.title, artista: album.artist })
+                }
+              >
+                <span aria-hidden="true">▶</span> <span>Escuchar el disco</span>
+              </button>
+            </div>
+          )}
           {!esCancion && totalDisco > 0 && (
             <p className="yt">
               <span className="yt-duracion">{formatoDuracion(totalDisco)}</span>
@@ -111,7 +148,7 @@ export default function AlbumItem({ album, onActualizar, onEliminar, yt = {} }) 
         </div>
 
         {abierto && !esCancion && (
-          <Canciones tracks={album.tracks} yt={yt} onCambiar={(tracks) => actualizar({ tracks })} />
+          <Canciones tracks={album.tracks} artista={album.artist} yt={yt} onCambiar={(tracks) => actualizar({ tracks })} />
         )}
       </div>
     </li>

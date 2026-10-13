@@ -5,6 +5,7 @@
 //
 //   /api/spotify?tipo=album&titulo=Illmatic&artista=Nas
 //   /api/spotify?tipo=artista&nombre=Nas
+//   /api/spotify?tipo=cancion&titulo=N.Y. State of Mind&artista=Nas
 
 let token = null; // { valor, vence }
 
@@ -78,6 +79,28 @@ export async function buscarAlbum(titulo, artista, anio) {
   };
 }
 
+export async function buscarCancion(titulo, artista) {
+  const q = encodeURIComponent(`track:${titulo} artist:${artista}`);
+  const r = await api(`/search?type=track&limit=10&q=${q}`);
+  const t = normal(titulo);
+  const a = normal(artista);
+  const items = (r.tracks?.items ?? []).filter(Boolean);
+  const coincide = (x) => x.artists.some((y) => normal(y.name) === a || normal(y.name).includes(a) || a.includes(normal(y.name)));
+  // Primero título exacto del artista, después título parecido, después lo primero que haya.
+  const x =
+    items.find((y) => normal(y.name) === t && coincide(y)) ??
+    items.find((y) => normal(y.name).startsWith(t) && coincide(y)) ??
+    items.find(coincide);
+  if (!x) return null;
+  return {
+    id: x.id,
+    nombre: x.name,
+    artistas: x.artists.map((y) => y.name),
+    disco: x.album?.name ?? '',
+    duracion: Math.round(x.duration_ms / 1000),
+  };
+}
+
 export async function buscarArtista(nombre) {
   const r = await api(`/search?type=artist&limit=5&q=${encodeURIComponent(nombre)}`);
   const n = normal(nombre);
@@ -92,6 +115,7 @@ export default async function handler(req, res) {
     let datos = null;
     if (tipo === 'album' && titulo && artista) datos = await buscarAlbum(String(titulo), String(artista), anio);
     else if (tipo === 'artista' && nombre) datos = await buscarArtista(String(nombre));
+    else if (tipo === 'cancion' && titulo && artista) datos = await buscarCancion(String(titulo), String(artista));
     else return res.status(400).json({ error: 'Faltan parámetros' });
     if (!datos) return res.status(404).json({ error: 'No está en Spotify' });
     // Vercel guarda la respuesta un día: menos llamadas a Spotify y respuestas más rápidas.

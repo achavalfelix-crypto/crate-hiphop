@@ -1,5 +1,7 @@
 import { useEffect } from 'react';
 import Nav, { NOMBRE } from './components/Nav';
+import Instalar from './components/Instalar';
+import Reproductor from './components/Reproductor';
 import useRuta from './hooks/useRuta';
 import Album from './pages/Album';
 import Albumes from './pages/Albumes';
@@ -39,7 +41,9 @@ export default function App() {
           {NOMBRE} · Trabajo práctico de Desarrollo Frontend II (UADE). Textos e imágenes de artistas y discos: Wikipedia, con
           su fuente en cada ficha.
         </p>
+        <Instalar />
       </footer>
+      <Reproductor />
     </>
   );
 }

@@ -1,19 +1,23 @@
 import useSpotify from '../hooks/useSpotify';
+import { reproducir, useReproductor } from '../services/reproductor';
 import { artistaSpotify } from '../services/spotify';
 
-// Reproductor de Spotify con las canciones más escuchadas del artista.
+// Botón que pone en el reproductor de la página los temas más escuchados del artista.
 export default function ArtistaSpotify({ nombre }) {
   const { estado, datos } = useSpotify(() => artistaSpotify(nombre), nombre);
+  const pista = useReproductor();
   if (estado === 'cargando') return <p className="cargando">Buscando en Spotify…</p>;
-  if (estado !== 'listo') return null;
+  if (estado !== 'listo') return <p className="aviso-linea">No encontramos a {nombre} en Spotify.</p>;
+  const suena = pista?.id === datos.id;
   return (
-    <iframe
-      className="spotify-reproductor"
-      title={`Reproductor de Spotify: ${datos.nombre}`}
-      src={`https://open.spotify.com/embed/artist/${datos.id}?utm_source=generator&theme=0`}
-      height={352}
-      loading="lazy"
-      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-    />
+    <p>
+      <button
+        type="button"
+        className="btn btn-primario"
+        onClick={() => reproducir({ fuente: 'spotify', tipo: 'artist', id: datos.id, titulo: datos.nombre, artista: datos.nombre })}
+      >
+        {suena ? '▶ Sonando sus temas' : `▶ Escuchar los temas más conocidos de ${datos.nombre}`}
+      </button>
+    </p>
   );
 }

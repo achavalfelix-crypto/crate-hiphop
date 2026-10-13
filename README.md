@@ -13,6 +13,8 @@ Todos los datos del archivo están verificados y cada uno tiene su fuente a la v
 - **Álbumes:** 24 fichas con tapa, fecha de salida, sello, producción y un dato destacado. Cada disco trae **todas sus canciones desde Spotify**, con duración y reproductor: tocás un tema y suena ahí mismo, y con el + lo guardás en Mi cajón.
 - **Historia:** línea de tiempo de 1985 a 2016, cada hito con su fuente.
 - **Mi cajón:** la colección personal (detalle abajo).
+- **Reproductor:** una barra fija abajo que hace sonar cualquier disco o canción adentro de la página (Spotify o YouTube) y sigue sonando al cambiar de sección. No hace falta tener ninguna app instalada.
+- **App para el celular:** se instala desde el navegador (Android: botón "Instalar la app" al pie; iPhone: Compartir → Agregar a inicio) y abre en pantalla completa con su ícono.
 
 La barra de arriba siempre marca en dorado la sección en la que estás, y las migas de pan muestran el camino.
 
@@ -27,6 +29,9 @@ La barra de arriba siempre marca en dorado la sección en la que estás, y las m
 - Catálogo inicial opcional de 23 discos clave, para no arrancar con el cajón vacío.
 - Importar una lista desde un archivo JSON: valida cada entrada y saltea las que ya están en el cajón.
 - Duración y reproducciones de YouTube en vivo (se actualizan cada minuto) y link para escuchar cada canción, si tiene video asociado.
+- Botón ▶ en cada canción y disco: suena en el reproductor de la página. Si una canción no tiene link guardado, se busca sola en Spotify y queda guardada para la próxima.
+- Favoritas: corazón en cada entrada y en cada canción de un disco, y filtro "♥ Favoritas".
+- Al agregar un disco desde su ficha, se guarda con todas sus canciones de Spotify.
 - Mensajes de carga, éxito y error en cada operación.
 
 ## Tecnologías
@@ -47,6 +52,8 @@ users/{uid}/albums/{albumId}
   type: string         // album | cancion
   album: string        // de qué disco es la canción (opcional)
   videoId: string      // video de YouTube de la canción (opcional)
+  spotifyId: string    // canción o disco en Spotify (opcional)
+  favorita: boolean    // marcada con ♥ (opcional)
   title: string        // "Illmatic"
   artist: string       // "Nas"
   year: number         // 1980–2016
@@ -130,6 +137,7 @@ src/
   data/constantes.js     costas, estados y rango de años
   data/catalogo.js       catálogo inicial opcional
   data/archivo.js        artistas, álbumes e hitos verificados, cada uno con su fuente
+  services/reproductor.js  qué está sonando (un solo reproductor para todo el sitio)
   services/spotify.js    pide discos y artistas a /api/spotify, con caché
   services/wiki.js       resumen e imagen de Wikipedia (en español si existe), con caché
   hooks/useRuta.js       navegación entre secciones (#/artistas/dr-dre)
@@ -151,5 +159,6 @@ firestore.rules          reglas de seguridad
 - **v7.0** — Nuevo nombre, The Golden Era Archives. Pasa de cajón personal a archivo: inicio con collage y recorrido, artistas, álbumes e historia con datos verificados, imágenes de Wikipedia y la sección actual siempre marcada.
 - **v8.0** — Spotify: lista completa de canciones y reproductor en cada disco y artista, guardar temas en Mi cajón con un toque, y logo en tipografía de graffiti.
 - **v9.0** — Fondo de noche con grano y una luz que toma el color de la costa; fichas que se levantan, foto que se enciende al pasar el mouse, toda la ficha se puede tocar, transición animada de la lista a la ficha y un vinilo que sale de la funda y gira cuando suena un tema.
+- **v10.0** — Reproductor propio de la página (Spotify y YouTube, sin salir del sitio), play en cada canción del cajón con búsqueda automática, favoritas con filtro, discos que se guardan con todas sus canciones y app instalable en el celular.
 
 Las imágenes de artistas y tapas vienen de Wikipedia. Si no cargan, se muestra una portada generada con el color de la costa.

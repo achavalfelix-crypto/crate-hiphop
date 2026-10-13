@@ -1,8 +1,9 @@
 import { useState } from 'react';
+import BotonPlay from './BotonPlay';
 import DatosYouTube from './DatosYouTube';
 
 // Lista de canciones de un disco. Se guardan dentro del mismo documento, en el campo `tracks`.
-export default function Canciones({ tracks, onCambiar, yt = {} }) {
+export default function Canciones({ tracks, onCambiar, artista, yt = {} }) {
   const [nueva, setNueva] = useState('');
   const [error, setError] = useState('');
 
@@ -19,6 +20,9 @@ export default function Canciones({ tracks, onCambiar, yt = {} }) {
   const alternarFav = (id) =>
     onCambiar(tracks.map((t) => (t.id === id ? { ...t, fav: !t.fav } : t)));
   const quitar = (id) => onCambiar(tracks.filter((t) => t.id !== id));
+  // Guarda el ID de Spotify que encontró el reproductor, así la próxima vez suena directo.
+  const guardarSpotify = (id, spotifyId) =>
+    onCambiar(tracks.map((t) => (t.id === id ? { ...t, spotifyId } : t)));
 
   return (
     <div className="canciones">
@@ -29,6 +33,14 @@ export default function Canciones({ tracks, onCambiar, yt = {} }) {
           {tracks.map((t) => (
             <li key={t.id} className={t.fav ? 'fav' : ''}>
               <div className="cancion-fila">
+              <BotonPlay
+                chico
+                titulo={t.title}
+                artista={artista}
+                spotifyId={t.spotifyId}
+                videoId={t.videoId}
+                onEncontrada={(sid) => guardarSpotify(t.id, sid)}
+              />
               <span className="cancion-titulo">{t.title}</span>
               <DatosYouTube videoId={t.videoId} datos={yt} compacto />
               <button

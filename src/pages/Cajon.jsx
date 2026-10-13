@@ -114,6 +114,7 @@ export default function Cajon() {
         (!filtros.costa || a.coast === filtros.costa) &&
         (!filtros.estado || a.status === filtros.estado) &&
         (!filtros.anio || a.year === filtros.anio) &&
+        (!filtros.favoritas || a.favorita || a.tracks.some((t) => t.fav)) &&
         (!q ||
           a.title.toLowerCase().includes(q) ||
           a.artist.toLowerCase().includes(q) ||
