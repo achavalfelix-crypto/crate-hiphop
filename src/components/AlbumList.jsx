@@ -1,13 +1,14 @@
 import AlbumItem from './AlbumItem';
 
-export default function AlbumList({ albums, hayFiltros, onActualizar, onEliminar }) {
+export default function AlbumList({ albums, onActualizar, onEliminar, onLimpiarFiltros }) {
   if (albums.length === 0) {
     return (
-      <p className="vacio">
-        {hayFiltros
-          ? 'Ningún disco coincide con los filtros.'
-          : 'Todavía no agregaste discos. Cargá el primero con el formulario.'}
-      </p>
+      <div className="vacio">
+        <p>Ningún disco coincide con la búsqueda.</p>
+        <button type="button" className="btn" onClick={onLimpiarFiltros}>
+          Ver todos los discos
+        </button>
+      </div>
     );
   }
 

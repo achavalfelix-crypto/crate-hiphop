@@ -13,7 +13,8 @@ const firebaseConfig = {
 
 export const firebaseConfigurado = Object.values(firebaseConfig).every(Boolean);
 
-const app = initializeApp(firebaseConfig);
+// Si faltan variables no se inicializa: la app muestra un mensaje en vez de quedar en blanco.
+const app = firebaseConfigurado ? initializeApp(firebaseConfig) : null;
 
-export const auth = getAuth(app);
-export const db = getFirestore(app);
+export const auth = app ? getAuth(app) : null;
+export const db = app ? getFirestore(app) : null;

@@ -13,11 +13,13 @@ import {
   query,
   serverTimestamp,
   updateDoc,
+  writeBatch,
 } from 'firebase/firestore';
 import { auth, db } from '../firebase';
 
 // Inicia sesión anónima (si hace falta) y devuelve el uid del visitante.
 export function iniciarSesion() {
+  if (!auth) return Promise.reject(new Error('Faltan las variables VITE_FIREBASE_*'));
   return new Promise((resolve, reject) => {
     const cortar = onAuthStateChanged(
       auth,
@@ -74,6 +76,19 @@ export function actualizarAlbum(uid, album, cambios) {
     escuchado: deleteField(), // campo viejo de la v1
     updatedAt: serverTimestamp(),
   });
+}
+
+// AGREGAR VARIOS: carga el catálogo inicial en una sola operación (todo o nada).
+export function cargarCatalogo(uid, lista) {
+  const lote = writeBatch(db);
+  lista.forEach((datos) => {
+    lote.set(doc(albumsRef(uid)), {
+      ...datos,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
+  });
+  return lote.commit();
 }
 
 // ELIMINAR

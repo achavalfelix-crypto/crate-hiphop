@@ -27,6 +27,7 @@ export default function Canciones({ tracks, onCambiar }) {
         <ol>
           {tracks.map((t) => (
             <li key={t.id} className={t.fav ? 'fav' : ''}>
+              <div className="cancion-fila">
               <span className="cancion-titulo">{t.title}</span>
               <button
                 type="button"
@@ -45,6 +46,7 @@ export default function Canciones({ tracks, onCambiar }) {
               >
                 ×
               </button>
+              </div>
             </li>
           ))}
         </ol>

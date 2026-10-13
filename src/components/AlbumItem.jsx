@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { ESTADOS, nombreCosta } from '../data/constantes';
 import AlbumForm from './AlbumForm';
 import Canciones from './Canciones';
+import Portada from './Portada';
 import Puntaje from './Puntaje';
 
 export default function AlbumItem({ album, onActualizar, onEliminar }) {
   const [abierto, setAbierto] = useState(false);
   const [editando, setEditando] = useState(false);
+  const [confirmando, setConfirmando] = useState(false);
 
   const actualizar = (cambios) => onActualizar(album, cambios);
   const favoritas = album.tracks.filter((t) => t.fav).length;
@@ -14,6 +16,7 @@ export default function AlbumItem({ album, onActualizar, onEliminar }) {
   if (editando) {
     return (
       <li className="album editando">
+        <Portada album={album} />
         <AlbumForm
           inicial={album}
           onGuardar={async (datos) => {
@@ -28,42 +31,67 @@ export default function AlbumItem({ album, onActualizar, onEliminar }) {
   }
 
   return (
-    <li className={`album costa-${album.coast}`}>
-      <div className="album-principal">
+    <li className={`album estado-${album.status}`}>
+      <Portada album={album} />
+
+      <div className="album-cuerpo">
         <div className="album-datos">
           <h3>{album.title}</h3>
-          <p>
-            {album.artist} · {album.year} · {nombreCosta(album.coast)}
+          <p className="album-artista">{album.artist}</p>
+          <p className="album-meta">
+            <span className={`muestra costa-${album.coast}`} />
+            {nombreCosta(album.coast)}, {album.year}
           </p>
         </div>
-        <select
-          aria-label={`Estado de ${album.title}`}
-          value={album.status}
-          onChange={(e) => actualizar({ status: e.target.value })}
-        >
-          {ESTADOS.map((e) => (
-            <option key={e.id} value={e.id}>
-              {e.nombre}
-            </option>
-          ))}
-        </select>
-        <Puntaje valor={album.rating} onCambiar={(rating) => actualizar({ rating })} />
-      </div>
 
-      <div className="album-acciones">
-        <button className="btn" aria-expanded={abierto} onClick={() => setAbierto(!abierto)}>
-          Canciones ({album.tracks.length}
-          {favoritas ? `, ${favoritas} ♥` : ''})
-        </button>
-        <button className="btn" onClick={() => setEditando(true)}>
-          Editar
-        </button>
-        <button className="btn btn-peligro" onClick={() => onEliminar(album)}>
-          Eliminar
-        </button>
-      </div>
+        <div className="album-controles">
+          <div className="segmentado segmentado-chico" role="group" aria-label={`Estado de ${album.title}`}>
+            {ESTADOS.map((e) => (
+              <button
+                key={e.id}
+                type="button"
+                aria-pressed={album.status === e.id}
+                onClick={() => album.status !== e.id && actualizar({ status: e.id })}
+              >
+                {e.nombre}
+              </button>
+            ))}
+          </div>
+          <Puntaje valor={album.rating} onCambiar={(rating) => actualizar({ rating })} />
+        </div>
 
-      {abierto && <Canciones tracks={album.tracks} onCambiar={(tracks) => actualizar({ tracks })} />}
+        <div className="album-acciones">
+          <button
+            type="button"
+            className="btn-texto"
+            aria-expanded={abierto}
+            onClick={() => setAbierto(!abierto)}
+          >
+            {abierto ? 'Ocultar canciones' : 'Canciones'} ({album.tracks.length}
+            {favoritas ? `, ${favoritas} ♥` : ''})
+          </button>
+          <button type="button" className="btn-texto" onClick={() => setEditando(true)}>
+            Editar
+          </button>
+          {confirmando ? (
+            <span className="confirmar" role="group" aria-label="Confirmar eliminación">
+              ¿Eliminar este disco?
+              <button type="button" className="btn-texto peligro" onClick={() => onEliminar(album)}>
+                Sí, eliminar
+              </button>
+              <button type="button" className="btn-texto" onClick={() => setConfirmando(false)}>
+                No
+              </button>
+            </span>
+          ) : (
+            <button type="button" className="btn-texto peligro" onClick={() => setConfirmando(true)}>
+              Eliminar
+            </button>
+          )}
+        </div>
+
+        {abierto && <Canciones tracks={album.tracks} onCambiar={(tracks) => actualizar({ tracks })} />}
+      </div>
     </li>
   );
 }
