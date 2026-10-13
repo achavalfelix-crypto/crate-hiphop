@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import DiscoSpotify from '../components/DiscoSpotify';
 import ImagenWiki from '../components/ImagenWiki';
 import { Migas } from '../components/Nav';
 import { Dato } from '../components/Recuadros';
@@ -78,6 +79,11 @@ export default function Album({ id }) {
               Escuchar en YouTube Music
             </a>
           </div>
+
+          <section aria-labelledby="t-escuchar">
+            <h2 id="t-escuchar">Escuchalo entero</h2>
+            <DiscoSpotify disco={d} autor={autorDe(d)} />
+          </section>
 
           <section aria-labelledby="t-resena">
             <h2 id="t-resena">Sobre el disco</h2>

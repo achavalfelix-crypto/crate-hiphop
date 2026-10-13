@@ -9,8 +9,8 @@ Todos los datos del archivo están verificados y cada uno tiene su fuente a la v
 ## Secciones
 
 - **Inicio:** collage con las tapas de todos los álbumes, el propósito de la página y un recorrido en cinco capítulos con los discos más famosos.
-- **Artistas:** 26 fichas con imagen, resumen de Wikipedia, logros, un dato destacado y, cuando existe, una cita verificada. Se filtran por costa.
-- **Álbumes:** 24 fichas con tapa, fecha de salida, sello, producción y un dato destacado. Desde cada disco se puede agregar a Mi cajón o buscarlo en YouTube Music.
+- **Artistas:** 26 fichas con imagen, resumen de Wikipedia, logros, un dato destacado, una cita verificada cuando existe y el reproductor de Spotify con sus temas más escuchados. Se filtran por costa.
+- **Álbumes:** 24 fichas con tapa, fecha de salida, sello, producción y un dato destacado. Cada disco trae **todas sus canciones desde Spotify**, con duración y reproductor: tocás un tema y suena ahí mismo, y con el + lo guardás en Mi cajón.
 - **Historia:** línea de tiempo de 1985 a 2016, cada hito con su fuente.
 - **Mi cajón:** la colección personal (detalle abajo).
 
@@ -36,6 +36,7 @@ La barra de arriba siempre marca en dorado la sección en la que estás, y las m
 - Vercel
 - API REST de Wikipedia (resúmenes e imágenes, licencia CC BY-SA)
 - YouTube Data API v3
+- Spotify Web API (flujo client credentials, desde una función de Vercel en `api/spotify.js`)
 
 ## Datos en Firestore
 
@@ -88,6 +89,15 @@ Es una clave de navegador de Google Cloud con la **YouTube Data API v3** habilit
 
 Después de cambiar `.env`, reiniciá `npm run dev`.
 
+## Spotify
+
+La página usa Spotify sin pedirle a nadie que inicie sesión, así la puede usar cualquier visitante. La función `api/spotify.js` corre en Vercel, pide un token con el Client ID y el Client Secret y busca el disco o el artista. El secreto nunca llega al navegador. Vercel guarda cada respuesta un día para no gastar la cuota.
+
+1. En [developer.spotify.com/dashboard](https://developer.spotify.com/dashboard) creá una app con la Web API (la cuenta dueña necesita Premium).
+2. Copiá el Client ID y el Client Secret a Vercel (Settings → Environment Variables) como `SPOTIFY_CLIENT_ID` y `SPOTIFY_CLIENT_SECRET`, y también a tu `.env` para probar en local.
+
+Sin cuenta de Spotify, el reproductor pasa fragmentos; con la cuenta abierta en el navegador, los temas completos.
+
 ## Reglas de Firestore
 
 Copiar el contenido de `firestore.rules` en Firebase Console → Firestore Database → Reglas, y publicar.
@@ -120,11 +130,13 @@ src/
   data/constantes.js     costas, estados y rango de años
   data/catalogo.js       catálogo inicial opcional
   data/archivo.js        artistas, álbumes e hitos verificados, cada uno con su fuente
+  services/spotify.js    pide discos y artistas a /api/spotify, con caché
   services/wiki.js       resumen e imagen de Wikipedia (en español si existe), con caché
   hooks/useRuta.js       navegación entre secciones (#/artistas/dr-dre)
   pages/                 Inicio, Artistas, Artista, Albumes, Album, Historia, Cajon
   components/            interfaz (barra, selector de costa, recuadros, lista, formulario, línea de tiempo…)
   App.jsx                elige la página según la dirección
+api/spotify.js           función de Vercel que habla con Spotify (guarda el secreto)
 firestore.rules          reglas de seguridad
 ```
 
@@ -137,5 +149,6 @@ firestore.rules          reglas de seguridad
 - **v5.0** — Importar desde un archivo JSON (por ejemplo, una lista armada a partir del historial de YouTube Music), sin duplicar lo que ya está.
 - **v6.0** — Duración y reproducciones en vivo desde la YouTube Data API, link para escuchar y duración total de cada disco.
 - **v7.0** — Nuevo nombre, The Golden Era Archives. Pasa de cajón personal a archivo: inicio con collage y recorrido, artistas, álbumes e historia con datos verificados, imágenes de Wikipedia y la sección actual siempre marcada.
+- **v8.0** — Spotify: lista completa de canciones y reproductor en cada disco y artista, guardar temas en Mi cajón con un toque, y logo en tipografía de graffiti.
 
 Las imágenes de artistas y tapas vienen de Wikipedia. Si no cargan, se muestra una portada generada con el color de la costa.

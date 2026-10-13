@@ -1,3 +1,4 @@
+import ArtistaSpotify from '../components/ArtistaSpotify';
 import ImagenWiki from '../components/ImagenWiki';
 import { Migas } from '../components/Nav';
 import { Cita, Dato } from '../components/Recuadros';
@@ -68,6 +69,11 @@ export default function Artista({ id }) {
             <Dato texto={a.dato} fuente={a.fuente} />
             <Cita cita={a.cita} />
           </div>
+
+          <section aria-labelledby="t-escuchar">
+            <h2 id="t-escuchar">Escuchalo</h2>
+            <ArtistaSpotify nombre={a.nombre} />
+          </section>
         </div>
       </article>
 

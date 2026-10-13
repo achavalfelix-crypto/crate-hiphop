@@ -792,7 +792,8 @@ select {
 /* ═════════ v7: The Golden Era Archives ═════════ */
 :root {
   --oro: #d9a62e; /* marca dónde está la persona */
-  --logo: var(--gotica);
+  --graffiti: 'Sedgwick Ave Display', 'Marker Felt', cursive;
+  --logo: var(--graffiti);
   --display: var(--texto);
 }
 .saltar {
@@ -829,8 +830,8 @@ main:focus {
 }
 .nav-logo {
   font-family: var(--logo);
-  font-weight: 700;
-  font-size: 1.5rem;
+  font-weight: 400;
+  font-size: 1.75rem;
   line-height: 1;
   color: var(--papel);
   text-decoration: none;
@@ -934,7 +935,7 @@ main:focus {
 }
 .hero-titulo {
   font-family: var(--logo);
-  font-weight: 700;
+  font-weight: 400;
   font-size: clamp(3rem, 9vw, 7rem);
   line-height: 0.9;
 }
@@ -1503,4 +1504,101 @@ main:focus {
   .hito-imagen {
     display: none;
   }
+}
+
+/* ───────── v8: Spotify ───────── */
+.spotify {
+  margin: 8px 0 24px;
+}
+.spotify-reproductor {
+  display: block;
+  width: 100%;
+  border: 0;
+  border-radius: 12px;
+  background: var(--tinta);
+}
+.spotify .nota-fuente {
+  margin: 8px 0 16px;
+}
+.pistas {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 2px solid var(--tinta);
+}
+.pista {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid rgba(20, 18, 16, 0.18);
+}
+.pista-play {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 2.5rem 1fr auto;
+  align-items: baseline;
+  gap: 8px;
+  padding: 10px 8px;
+  background: none;
+  border: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  min-height: 44px;
+}
+.pista-play:hover {
+  background: rgba(20, 18, 16, 0.06);
+}
+.pista.sonando {
+  background: var(--oro);
+}
+.pista-num {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.7;
+  text-align: right;
+}
+.pista.sonando .pista-num {
+  opacity: 1;
+}
+.pista-nombre small {
+  opacity: 0.7;
+}
+.pista-e {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 0 4px;
+  font-size: 0.65rem;
+  line-height: 1.4;
+  vertical-align: 2px;
+  background: rgba(20, 18, 16, 0.55);
+  color: var(--papel);
+  border-radius: 2px;
+  text-decoration: none;
+}
+.pista-dur {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.75;
+}
+.pista-guardar,
+.pista-ok {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  background: none;
+  border: 0;
+  font: inherit;
+  font-size: 1.4rem;
+  color: inherit;
+  cursor: pointer;
+}
+.pista-ok {
+  width: auto;
+  padding: 0 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.pista-guardar:hover {
+  background: rgba(20, 18, 16, 0.08);
 }
