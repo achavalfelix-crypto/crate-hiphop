@@ -1,10 +1,22 @@
-# Crate — rap gangster 1980–2016
+# The Golden Era Archives
 
-Aplicación web para armar tu propio cajón de discos y canciones de rap gangster de Estados Unidos, de 1980 a 2016. Registrás discos y canciones sueltas, marcás qué escuchaste, puntuás y ves tu colección ordenada en una línea de tiempo por año y por costa.
+Un archivo del rap que salió de las calles de Estados Unidos entre 1980 y 2016. Recorrés a los artistas (su vida, sus premios y lo que dijeron), los álbumes que definieron cada costa y la historia de la cultura en trece momentos. Además, en **Mi cajón** armás tu propia colección de discos y canciones: marcás qué escuchaste, puntuás y la ves en una línea de tiempo por año y por costa.
+
+Todos los datos del archivo están verificados y cada uno tiene su fuente a la vista.
 
 **TP2 — Desarrollo Frontend II (UADE, FADI).** React + Vite, Cloud Firestore y despliegue en Vercel.
 
-## Funciones
+## Secciones
+
+- **Inicio:** collage con las tapas de todos los álbumes, el propósito de la página y un recorrido en cinco capítulos con los discos más famosos.
+- **Artistas:** 26 fichas con imagen, resumen de Wikipedia, logros, un dato destacado y, cuando existe, una cita verificada. Se filtran por costa.
+- **Álbumes:** 24 fichas con tapa, fecha de salida, sello, producción y un dato destacado. Desde cada disco se puede agregar a Mi cajón o buscarlo en YouTube Music.
+- **Historia:** línea de tiempo de 1985 a 2016, cada hito con su fuente.
+- **Mi cajón:** la colección personal (detalle abajo).
+
+La barra de arriba siempre marca en dorado la sección en la que estás, y las migas de pan muestran el camino.
+
+## Funciones de Mi cajón
 
 - Agregar, editar y eliminar discos y canciones sueltas (título, artista, año, costa; las canciones pueden indicar de qué disco son).
 - Cambiar el estado de cada disco: por escuchar, escuchando o escuchado.
@@ -22,6 +34,8 @@ Aplicación web para armar tu propio cajón de discos y canciones de rap gangste
 - React 19 + Vite
 - Firebase: Authentication (anónima) y Cloud Firestore
 - Vercel
+- API REST de Wikipedia (resúmenes e imágenes, licencia CC BY-SA)
+- YouTube Data API v3
 
 ## Datos en Firestore
 
@@ -105,8 +119,12 @@ src/
   services/albums.js     todas las operaciones con Firestore (consultar, agregar, modificar, eliminar)
   data/constantes.js     costas, estados y rango de años
   data/catalogo.js       catálogo inicial opcional
-  components/            interfaz (lista, formulario, línea de tiempo, filtros, canciones…)
-  App.jsx                estado principal de la app
+  data/archivo.js        artistas, álbumes e hitos verificados, cada uno con su fuente
+  services/wiki.js       resumen e imagen de Wikipedia (en español si existe), con caché
+  hooks/useRuta.js       navegación entre secciones (#/artistas/dr-dre)
+  pages/                 Inicio, Artistas, Artista, Albumes, Album, Historia, Cajon
+  components/            interfaz (barra, selector de costa, recuadros, lista, formulario, línea de tiempo…)
+  App.jsx                elige la página según la dirección
 firestore.rules          reglas de seguridad
 ```
 
@@ -118,5 +136,6 @@ firestore.rules          reglas de seguridad
 - **v4.0** — Canciones sueltas además de discos: selector Disco/Canción, filtro por tipo, portada redonda y bloque bajo en la línea de tiempo.
 - **v5.0** — Importar desde un archivo JSON (por ejemplo, una lista armada a partir del historial de YouTube Music), sin duplicar lo que ya está.
 - **v6.0** — Duración y reproducciones en vivo desde la YouTube Data API, link para escuchar y duración total de cada disco.
+- **v7.0** — Nuevo nombre, The Golden Era Archives. Pasa de cajón personal a archivo: inicio con collage y recorrido, artistas, álbumes e historia con datos verificados, imágenes de Wikipedia y la sección actual siempre marcada.
 
-Las portadas son generadas con tipografía (color de la costa + inicial). No se usan tapas reales.
+Las imágenes de artistas y tapas vienen de Wikipedia. Si no cargan, se muestra una portada generada con el color de la costa.
