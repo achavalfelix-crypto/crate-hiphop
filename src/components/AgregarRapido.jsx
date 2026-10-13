@@ -43,14 +43,14 @@ export default function AgregarRapido({ onAgregar, onAMano, yaEsta, extra }) {
         const d = await discoSpotify(item.id);
         await onAgregar({
           type: 'album', album: '', videoId: '', spotifyId: d.id, favorita: false,
-          title: d.nombre.slice(0, 120), artist: d.artistas.map((a) => a.nombre).join(', ').slice(0, 80),
+          title: d.nombre.slice(0, 120), artist: d.artistas.map((a) => a.nombre).join(', ').slice(0, 80), tapa: (d.tapa ?? '').slice(0, 300),
           year: d.anio || 1980, coast: costa,
           tracks: d.canciones.slice(0, 60).map((c) => ({ id: crypto.randomUUID(), title: c.nombre.slice(0, 120), fav: false, spotifyId: c.id })),
         });
       } else {
         await onAgregar({
           type: 'cancion', album: item.disco.slice(0, 120), videoId: '', spotifyId: item.id, favorita: false,
-          title: item.nombre.slice(0, 120), artist: item.artista.slice(0, 80), year: item.anio || 1980, coast: costa, tracks: [],
+          title: item.nombre.slice(0, 120), artist: item.artista.slice(0, 80), year: item.anio || 1980, coast: costa, tracks: [], tapa: (item.tapa ?? '').slice(0, 300),
         });
       }
     } finally {

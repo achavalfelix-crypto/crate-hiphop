@@ -7,13 +7,15 @@ export default function AgregarDisco({ datos, autor, costa }) {
   const [estado, setEstado] = useState('listo');
   const anio = datos.anio || 1980;
 
+  if (anio > 2016) return <p className="nota-fuente">Salió después de 2016: queda fuera del cajón, que llega hasta 2016.</p>;
+
   async function agregar() {
     setEstado('guardando');
     try {
       const uid = await iniciarSesion();
       await agregarAlbum(uid, {
         type: 'album', album: '', videoId: '', spotifyId: datos.id, favorita: false,
-        title: datos.nombre.slice(0, 120), artist: autor.slice(0, 80), year: anio, coast: costa,
+        title: datos.nombre.slice(0, 120), artist: autor.slice(0, 80), year: anio, coast: costa, tapa: (datos.tapa ?? '').slice(0, 300),
         status: 'pendiente', rating: 0,
         tracks: datos.canciones.slice(0, 60).map((c) => ({ id: crypto.randomUUID(), title: c.nombre.slice(0, 120), fav: false, spotifyId: c.id })),
       });

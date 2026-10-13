@@ -1,6 +1,6 @@
 import AlbumItem from './AlbumItem';
 
-export default function AlbumList({ albums, onActualizar, onEliminar, onLimpiarFiltros, yt }) {
+export default function AlbumList({ albums, onActualizar, onEliminar, onTapa, onLimpiarFiltros, yt }) {
   if (albums.length === 0) {
     return (
       <div className="vacio">
@@ -15,7 +15,7 @@ export default function AlbumList({ albums, onActualizar, onEliminar, onLimpiarF
   return (
     <ul className="lista">
       {albums.map((a) => (
-        <AlbumItem key={a.id} album={a} yt={yt} onActualizar={onActualizar} onEliminar={onEliminar} />
+        <AlbumItem key={a.id} album={a} yt={yt} onActualizar={onActualizar} onEliminar={onEliminar} onTapa={onTapa} />
       ))}
     </ul>
   );

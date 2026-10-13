@@ -184,5 +184,6 @@ firestore.rules          reglas de seguridad
 - **v14.0** — Todos los discos: discografía completa de cada artista y buscador de cualquier disco, con su propia página (canciones, play, agregar al cajón). Los 24 del archivo siguen con ficha verificada (★).
 - **v14.1** — La lista de Álbumes muestra todos los discos de todos los artistas (no solo los 24 del archivo), con filtros por costa, artista y nombre.
 - **v15.0** — Mi cajón rediseñado: tarjetas con tapa real, historia corta de los discos del archivo, agregar buscando en Spotify, línea de tiempo y filtros más simples.
+- **v16.0** — Álbumes en un solo pedido (las 26 discografías juntas, guardadas una semana en Vercel para no gastar la cuota de Spotify), solo discos hasta 2016, tapas guardadas en cada disco del cajón y canciones de un disco rediseñadas con "Traer todas las canciones de Spotify".
 
 Las imágenes de artistas y tapas vienen de Wikipedia. Si no cargan, se muestra una portada generada con el color de la costa.

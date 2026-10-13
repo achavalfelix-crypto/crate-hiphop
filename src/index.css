@@ -3066,3 +3066,90 @@ body.con-reproductor:has(.donde-suena) {
     grid-column: 1 / -1;
   }
 }
+
+/* ── v16: canciones de un disco en el cajón ── */
+.canciones-disco {
+  display: grid;
+  gap: 12px;
+  margin-top: 4px;
+  padding-top: 12px;
+  border-top: 1px solid var(--linea);
+}
+.cd-lista {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.cd-lista li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--linea);
+}
+.cd-num {
+  width: 1.6rem;
+  flex: none;
+  text-align: right;
+  color: var(--gris);
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+}
+.cd-titulo {
+  flex: 1;
+  min-width: 0;
+}
+.cd-lista li.fav .cd-titulo {
+  font-weight: 600;
+}
+.cd-icono {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--gris);
+  font-size: 1.05rem;
+  cursor: pointer;
+}
+.cd-icono:hover {
+  background: rgba(241, 235, 224, 0.1);
+  color: var(--tinta);
+}
+.cd-icono.activo {
+  color: #ff5a6e;
+}
+.cd-pie {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+}
+.cd-agregar {
+  flex: 1 1 260px;
+  display: flex;
+  gap: 8px;
+}
+.cd-agregar input {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 12px;
+  border: 1px solid var(--linea);
+  border-radius: 999px;
+}
+.cd-agregar .btn {
+  flex: none;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border-width: 1px;
+}
+@media (max-width: 720px) {
+  /* En el celu, las canciones usan todo el ancho de la tarjeta (debajo de la tapa también) */
+  .album-tarjeta .canciones-disco {
+    margin-left: calc(-76px - 12px);
+  }
+  .cd-lista li {
+    gap: 8px;
+  }
+}

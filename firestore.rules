@@ -10,15 +10,16 @@ service cloud.firestore {
 
       // Valida forma y valores de cada entrada (disco o canción) antes de guardarla.
       function albumValido(d) {
-        return d.keys().hasOnly(['type', 'album', 'videoId', 'spotifyId', 'favorita', 'title', 'artist', 'year', 'coast', 'status', 'rating', 'tracks', 'createdAt', 'updatedAt'])
+        return d.keys().hasOnly(['type', 'album', 'videoId', 'spotifyId', 'favorita', 'tapa', 'title', 'artist', 'year', 'coast', 'status', 'rating', 'tracks', 'createdAt', 'updatedAt'])
           && (!('type' in d) || d.type in ['album', 'cancion'])
           && (!('album' in d) || (d.album is string && d.album.size() <= 120))
           && (!('videoId' in d) || (d.videoId is string && d.videoId.size() <= 20))
           && (!('spotifyId' in d) || (d.spotifyId is string && d.spotifyId.size() <= 40))
           && (!('favorita' in d) || d.favorita is bool)
+          && (!('tapa' in d) || (d.tapa is string && d.tapa.size() <= 300))
           && d.title is string && d.title.size() > 0 && d.title.size() <= 120
           && d.artist is string && d.artist.size() > 0 && d.artist.size() <= 80
-          && d.year is int && d.year >= 1960 && d.year <= 2030
+          && d.year is int && d.year >= 1960 && d.year <= 2016
           && d.coast in ['west', 'east', 'south', 'midwest']
           && d.status in ['pendiente', 'escuchando', 'escuchado']
           && d.rating is int && d.rating >= 0 && d.rating <= 5

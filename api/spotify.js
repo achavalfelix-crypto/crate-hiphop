@@ -11,6 +11,8 @@
 //   /api/spotify?tipo=config   → Client ID para conectar la cuenta (es público)
 //   /api/spotify?tipo=cancion&titulo=N.Y. State of Mind&artista=Nas
 
+import { ARTISTAS } from '../src/data/archivo.js';
+
 let token = null; // { valor, vence }
 
 async function pedirToken() {
@@ -38,13 +40,16 @@ async function api(ruta, intento = 0) {
   const res = await fetch('https://api.spotify.com/v1' + ruta, {
     headers: { Authorization: `Bearer ${await pedirToken()}` },
   });
-  // Si Spotify pide esperar (muchos pedidos juntos), esperamos lo que dice y reintentamos hasta 2 veces.
-  if (res.status === 429 && intento < 2) {
-    const segundos = Math.min(Number(res.headers.get('retry-after')) || 1, 4);
-    await esperar(segundos * 1000 + 200);
-    return api(ruta, intento + 1);
+  // Si Spotify pide esperar poco (muchos pedidos juntos), esperamos y reintentamos hasta 2 veces.
+  // Si pide esperar mucho o se terminó la cuota del día, cortamos enseguida (no tiene sentido esperar).
+  if (res.status === 429) {
+    const segundos = Number(res.headers.get('retry-after')) || 1;
+    if (segundos <= 4 && intento < 2) {
+      await esperar(segundos * 1000 + 200);
+      return api(ruta, intento + 1);
+    }
+    throw Object.assign(new Error('Spotify limitó los pedidos por un rato. Probá más tarde.'), { estado: 429 });
   }
-  if (res.status === 429) throw Object.assign(new Error('Spotify está saturado, probá en un rato'), { estado: 429 });
   if (!res.ok) throw Object.assign(new Error(`Spotify respondió ${res.status}`), { estado: 502 });
   return res.json();
 }
@@ -99,6 +104,8 @@ export async function discoPorId(id) {
 }
 
 // Resumen de un disco para listas y grillas.
+const HASTA = 2016;
+
 const resumen = (x) => ({
   id: x.id,
   nombre: x.name,
@@ -109,6 +116,8 @@ const resumen = (x) => ({
 });
 
 // Todos los discos de un artista (sin repetir reediciones: queda la versión más vieja de cada título).
+let limitePagina = 50; // si Spotify no acepta 50 por página, pasamos a 10 y lo recordamos
+
 export async function discografia(nombre) {
   const art = await buscarArtista(nombre);
   if (!art) return null;
@@ -116,8 +125,10 @@ export async function discografia(nombre) {
   for (let offset = 0; offset < 100; ) {
     let r;
     try {
-      r = await api(`/artists/${art.id}/albums?include_groups=album&limit=50&offset=${offset}`);
-    } catch {
+      r = await api(`/artists/${art.id}/albums?include_groups=album&limit=${limitePagina}&offset=${offset}`);
+    } catch (e) {
+      if (limitePagina === 10 || e.estado === 429) throw e;
+      limitePagina = 10;
       r = await api(`/artists/${art.id}/albums?include_groups=album&limit=10&offset=${offset}`);
     }
     const items = r.items ?? [];
@@ -131,7 +142,30 @@ export async function discografia(nombre) {
     const prev = porTitulo.get(k);
     if (!prev || (x.anio && x.anio < prev.anio)) porTitulo.set(k, x);
   }
-  return { artista: art, discos: [...porTitulo.values()].sort((a, b) => a.anio - b.anio) };
+  // Solo hasta 2016 (la era del archivo). Los anteriores a 1980, si hay, quedan.
+  const discos = [...porTitulo.values()].filter((d) => d.anio && d.anio <= HASTA).sort((a, b) => a.anio - b.anio);
+  return { artista: art, discos };
+}
+
+// Las discografías de todos los artistas del archivo en un solo pedido.
+// Vercel guarda la respuesta una semana: Spotify se usa muy poco aunque entre mucha gente.
+export async function todasLasDiscografias() {
+  const salida = [];
+  let fallos = 0;
+  for (let i = 0; i < ARTISTAS.length; i += 3) {
+    const lote = ARTISTAS.slice(i, i + 3);
+    const res = await Promise.all(
+      lote.map((a) =>
+        discografia(a.nombre).catch((e) => {
+          fallos++;
+          if (e.estado === 429) throw e; // sin cuota: no seguimos pidiendo
+          return null;
+        }),
+      ),
+    );
+    lote.forEach((a, k) => salida.push({ id: a.id, discos: res[k]?.discos ?? [] }));
+  }
+  return { artistas: salida, incompleto: fallos > 0 };
 }
 
 // Buscar cualquier disco (dos páginas de 10, el máximo que deja Spotify en modo desarrollador).
@@ -141,7 +175,7 @@ export async function buscarDiscos(q) {
     api(`/search?type=album&limit=10&offset=0&q=${enc}`),
     api(`/search?type=album&limit=10&offset=10&q=${enc}`).catch(() => ({})),
   ]);
-  const items = [...(a.albums?.items ?? []), ...(b.albums?.items ?? [])].filter(Boolean).map(resumen);
+  const items = [...(a.albums?.items ?? []), ...(b.albums?.items ?? [])].filter(Boolean).map(resumen).filter((x) => x.anio && x.anio <= HASTA);
   const vistos = new Set();
   return items.filter((x) => (vistos.has(x.id) ? false : vistos.add(x.id)));
 }
@@ -190,7 +224,8 @@ export async function buscarCanciones(q) {
       anio: Number(String(x.album?.release_date ?? '').slice(0, 4)) || 0,
       tapa: x.album?.images?.[2]?.url ?? x.album?.images?.[1]?.url ?? x.album?.images?.[0]?.url ?? '',
       duracion: Math.round(x.duration_ms / 1000),
-    }));
+    }))
+    .filter((x) => x.anio && x.anio <= HASTA);
 }
 
 export async function buscarArtista(nombre) {
@@ -215,6 +250,12 @@ export default async function handler(req, res) {
     if (tipo === 'album' && titulo && artista) datos = await buscarAlbum(String(titulo), String(artista), anio);
     else if (tipo === 'artista' && nombre) datos = await buscarArtista(String(nombre));
     else if (tipo === 'cancion' && titulo && artista) datos = await buscarCancion(String(titulo), String(artista));
+    else if (tipo === 'todos') {
+      const r = await todasLasDiscografias();
+      // Completa: se guarda una semana. Incompleta (algún artista falló): solo 10 minutos.
+      res.setHeader('Cache-Control', r.incompleto ? 'public, s-maxage=600' : 'public, s-maxage=604800, stale-while-revalidate=2592000');
+      return res.status(200).json(r);
+    }
     else if (tipo === 'disco' && req.query.id) datos = await discoPorId(String(req.query.id));
     else if (tipo === 'discografia' && nombre) datos = await discografia(String(nombre));
     else if (tipo === 'buscarcanciones' && req.query.q && String(req.query.q).trim().length >= 2) datos = await buscarCanciones(String(req.query.q).slice(0, 80));

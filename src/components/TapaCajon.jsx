@@ -39,10 +39,15 @@ function useVisible() {
 
 // Tapa real de un disco o canción del cajón: la del archivo (Wikipedia) o la de Spotify.
 // Mientras carga, o si no hay, queda la portada tipográfica.
-export default function TapaCajon({ album }) {
+export default function TapaCajon({ album, onTapa }) {
   const arch = discoDelArchivo(album);
   const [ref, visible] = useVisible();
-  const tapa = useTapaSpotify(album, visible && !arch);
+  const buscada = useTapaSpotify(album, visible && !arch && !album.tapa);
+  const tapa = album.tapa || buscada;
+  // La primera vez que se consigue, se guarda en el disco: no hay que volver a pedírsela a Spotify.
+  useEffect(() => {
+    if (buscada && !album.tapa) onTapa?.(buscada);
+  }, [buscada]); // eslint-disable-line react-hooks/exhaustive-deps
   return (
     <div ref={ref} className={`tapa-cajon tipo-${album.type}`}>
       {arch ? (

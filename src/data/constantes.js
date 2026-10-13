@@ -1,9 +1,9 @@
 // La era del archivo (la línea de tiempo arranca y termina acá como mínimo)…
 export const ERA_DESDE = 1980;
 export const ERA_HASTA = 2016;
-// …pero el cajón acepta discos de cualquier año de la discografía de los artistas.
+// El cajón acepta discos anteriores a 1980 (si los hay en la discografía), pero nada después de 2016.
 export const ANIO_MIN = 1960;
-export const ANIO_MAX = 2030;
+export const ANIO_MAX = 2016;
 
 export const COSTAS = [
   { id: 'west', nombre: 'West Coast' },
@@ -35,6 +35,7 @@ export function normalizar(a) {
     videoId: a.videoId ?? '',
     spotifyId: a.spotifyId ?? '',
     favorita: a.favorita ?? false,
+    tapa: a.tapa ?? '',
     coast: a.coast ?? 'east',
     status: a.status ?? (a.escuchado ? 'escuchado' : 'pendiente'),
     rating: a.rating ?? 0,

@@ -270,6 +270,7 @@ export default function Cajon() {
                 albums={visibles}
                 yt={youtube.datos}
                 onLimpiarFiltros={() => setFiltros(SIN_FILTROS)}
+                onTapa={(album, tapa) => actualizarAlbum(uid, album, { tapa: tapa.slice(0, 300) }).catch(() => {})}
                 onActualizar={(album, cambios) =>
                   ejecutar(
                     () => actualizarAlbum(uid, album, cambios),

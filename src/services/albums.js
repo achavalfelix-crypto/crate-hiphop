@@ -63,13 +63,14 @@ export function agregarAlbum(uid, datos) {
 // MODIFICAR: recibe la entrada completa (disco o canción) y los cambios.
 // Se reescriben todos los campos para que lo guardado con versiones anteriores quede con el formato nuevo.
 export function actualizarAlbum(uid, album, cambios) {
-  const { type, album: deAlbum, videoId, spotifyId = '', favorita = false, title, artist, year, coast, status, rating, tracks } = album;
+  const { type, album: deAlbum, videoId, spotifyId = '', favorita = false, tapa = '', title, artist, year, coast, status, rating, tracks } = album;
   return updateDoc(albumRef(uid, album.id), {
     type,
     album: deAlbum,
     videoId,
     spotifyId,
     favorita,
+    tapa,
     title,
     artist,
     year,

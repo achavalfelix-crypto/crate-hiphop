@@ -39,6 +39,8 @@ export const discoSpotify = (id) => pedir({ tipo: 'disco', id });
 
 export const discografiaSpotify = (nombre) => pedir({ tipo: 'discografia', nombre });
 
+export const todasLasDiscografias = () => pedir({ tipo: 'todos' });
+
 export const buscarDiscosSpotify = (q) => pedir({ tipo: 'buscar', q });
 
 export const buscarCancionesSpotify = (q) => pedir({ tipo: 'buscarcanciones', q });

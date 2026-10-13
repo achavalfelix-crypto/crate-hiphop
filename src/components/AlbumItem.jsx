@@ -13,7 +13,7 @@ import { discoDelArchivo } from '../data/archivo';
 import TapaCajon from './TapaCajon';
 
 // Una tarjeta del cajón: un disco (con sus canciones) o una canción suelta.
-export default function AlbumItem({ album, onActualizar, onEliminar, yt = {} }) {
+export default function AlbumItem({ album, onActualizar, onEliminar, onTapa, yt = {} }) {
   const [abierto, setAbierto] = useState(false);
   const [editando, setEditando] = useState(false);
   const [confirmando, setConfirmando] = useState(false);
@@ -44,7 +44,7 @@ export default function AlbumItem({ album, onActualizar, onEliminar, yt = {} }) 
 
   return (
     <li className={`album album-tarjeta costa-${album.coast} estado-${album.status} tipo-${album.type}`}>
-      <TapaCajon album={album} />
+      <TapaCajon album={album} onTapa={(tapa) => onTapa?.(album, tapa)} />
 
       <div className="at-cuerpo">
         <div className="at-cabeza">
@@ -147,7 +147,7 @@ export default function AlbumItem({ album, onActualizar, onEliminar, yt = {} }) 
         </div>
 
         {abierto && !esCancion && (
-          <Canciones tracks={album.tracks} artista={album.artist} yt={yt} onCambiar={(tracks) => actualizar({ tracks })} />
+          <Canciones tracks={album.tracks} artista={album.artist} disco={album.title} anio={album.year} yt={yt} onCambiar={(tracks) => actualizar({ tracks })} />
         )}
       </div>
     </li>

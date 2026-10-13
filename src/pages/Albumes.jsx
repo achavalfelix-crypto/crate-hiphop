@@ -52,7 +52,7 @@ const POR_TANDA = 48;
 
 // Todos los discos de los 26 artistas del archivo (de cualquier año), desde Spotify.
 function TodosLosDiscos({ costa, todos }) {
-  const { discos, cargando, listos, total, error } = todos;
+  const { discos, desde, cargando, total, error } = todos;
   const [artista, setArtista] = useState('');
   const [texto, setTexto] = useState('');
   const [cuantos, setCuantos] = useState(POR_TANDA);
@@ -64,7 +64,13 @@ function TodosLosDiscos({ costa, todos }) {
       (!t || d.nombre.toLowerCase().includes(t) || d.artistaNombre.toLowerCase().includes(t)),
   );
 
-  if (error) return <p className="aviso-linea">No pudimos traer las discografías de Spotify. Probá recargar la página.</p>;
+  if (error) {
+    return (
+      <p className="aviso-linea">
+        No pudimos traer las discografías de Spotify ({error}). Mientras tanto, abajo están las fichas del archivo.
+      </p>
+    );
+  }
 
   return (
     <section className="todos-discos" aria-labelledby="t-todos">
@@ -72,9 +78,9 @@ function TodosLosDiscos({ costa, todos }) {
         Todos los discos de los artistas <span className="chip-num">{discos.length}</span>
       </h2>
       <p className="nota-fuente">
-        La discografía completa de los {total} artistas del archivo, de cualquier año, según Spotify. Los marcados con ★
-        tienen ficha completa y verificada.
-        {cargando && ` Cargando… (${listos} de ${total} artistas)`}
+        La discografía completa de los {total} artistas del archivo{desde ? `, de ${desde} a 2016` : ', hasta 2016'}, según
+        Spotify. Los marcados con ★ tienen ficha completa y verificada.
+        {cargando && ' Cargando…'}
       </p>
       <div className="filtros-discos">
         <select aria-label="Filtrar por artista" value={artista} onChange={(e) => { setArtista(e.target.value); setCuantos(POR_TANDA); }}>
