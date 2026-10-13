@@ -42,11 +42,16 @@ function GuardarCancion({ cancion, disco, autor }) {
 export default function DiscoSpotify({ disco, autor }) {
   const clave = `${disco.titulo}|${autor}`;
   const { estado, datos } = useSpotify(() => albumSpotify(disco.titulo, autor, disco.anio), clave);
-  const pista = useReproductor();
 
   if (estado === 'cargando') return <p className="cargando">Buscando el disco en Spotify…</p>;
   if (estado === 'vacio') return <p className="aviso-linea">Este disco no está en Spotify.</p>;
   if (estado === 'error') return <p className="aviso-linea">No pudimos conectar con Spotify ahora. Probá recargar la página.</p>;
+  return <ListaDisco datos={datos} disco={disco} autor={autor} />;
+}
+
+// La lista en sí (también la usan los discos que no están en el archivo, que ya traen los datos).
+export function ListaDisco({ datos, disco, autor }) {
+  const pista = useReproductor();
 
   const total = datos.canciones.reduce((s, c) => s + c.duracion, 0);
   const variosDiscos = datos.canciones.some((c) => c.disco > 1);

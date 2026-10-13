@@ -2662,3 +2662,32 @@ body.con-reproductor:has(.donde-suena) {
   vertical-align: 1px;
   margin-right: 6px;
 }
+
+/* ── v14: discografía completa y buscador de discos ── */
+.buscar-discos {
+  margin: 8px 0 40px;
+  padding: 18px;
+  border: 1px solid var(--linea);
+  border-radius: 6px;
+  background: var(--papel);
+}
+.buscar-discos h2 {
+  font-size: clamp(1.3rem, 3.5vw, 1.6rem);
+  font-stretch: 75%;
+}
+.buscar-discos .nota-fuente {
+  margin: 4px 0 12px;
+}
+.subtitulo-lista {
+  font-size: clamp(1.3rem, 3.5vw, 1.6rem);
+  font-stretch: 75%;
+  margin-bottom: 14px;
+}
+.grilla-discos img.imagen-wiki,
+.grilla-discos span.imagen-wiki {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  display: block;
+  background: var(--papel);
+}

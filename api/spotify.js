@@ -5,6 +5,9 @@
 //
 //   /api/spotify?tipo=album&titulo=Illmatic&artista=Nas
 //   /api/spotify?tipo=artista&nombre=Nas
+//   /api/spotify?tipo=disco&id=…           → un disco por ID
+//   /api/spotify?tipo=discografia&nombre=Nas → todos los discos del artista
+//   /api/spotify?tipo=buscar&q=…            → buscar cualquier disco
 //   /api/spotify?tipo=config   → Client ID para conectar la cuenta (es público)
 //   /api/spotify?tipo=cancion&titulo=N.Y. State of Mind&artista=Nas
 
@@ -61,13 +64,20 @@ export async function buscarAlbum(titulo, artista, anio) {
   const puntaje = (x) =>
     (normal(x.name) === t ? 0 : 10) + (anio && x.release_date?.startsWith(String(anio)) ? 0 : 5) + (x.album_type === 'album' ? 0 : 3);
   candidatos.sort((x, y) => puntaje(x) - puntaje(y) || (x.release_date ?? '').localeCompare(y.release_date ?? ''));
-  const elegido = await api(`/albums/${candidatos[0].id}`);
+  return discoPorId(candidatos[0].id);
+}
+
+// Un disco por su ID de Spotify, con todas sus canciones.
+export async function discoPorId(id) {
+  const elegido = await api(`/albums/${encodeURIComponent(id)}`);
   return {
     id: elegido.id,
     nombre: elegido.name,
     fecha: elegido.release_date,
+    anio: Number(String(elegido.release_date ?? '').slice(0, 4)) || 0,
     tapa: elegido.images?.[0]?.url ?? '',
     url: elegido.external_urls?.spotify ?? '',
+    artistas: (elegido.artists ?? []).map((y) => ({ id: y.id, nombre: y.name })),
     canciones: (elegido.tracks?.items ?? []).map((c) => ({
       id: c.id,
       numero: c.track_number,
@@ -78,6 +88,54 @@ export async function buscarAlbum(titulo, artista, anio) {
       artistas: c.artists.map((y) => y.name),
     })),
   };
+}
+
+// Resumen de un disco para listas y grillas.
+const resumen = (x) => ({
+  id: x.id,
+  nombre: x.name,
+  anio: Number(String(x.release_date ?? '').slice(0, 4)) || 0,
+  tapa: x.images?.[1]?.url ?? x.images?.[0]?.url ?? '',
+  artista: x.artists?.map((y) => y.name).join(', ') ?? '',
+  tipo: x.album_type,
+});
+
+// Todos los discos de un artista (sin repetir reediciones: queda la versión más vieja de cada título).
+export async function discografia(nombre) {
+  const art = await buscarArtista(nombre);
+  if (!art) return null;
+  const todos = [];
+  for (let offset = 0; offset < 200; ) {
+    let r;
+    try {
+      r = await api(`/artists/${art.id}/albums?include_groups=album&limit=50&offset=${offset}`);
+    } catch {
+      r = await api(`/artists/${art.id}/albums?include_groups=album&limit=10&offset=${offset}`);
+    }
+    const items = r.items ?? [];
+    todos.push(...items);
+    if (!r.next || !items.length) break;
+    offset += items.length;
+  }
+  const porTitulo = new Map();
+  for (const x of todos.map(resumen)) {
+    const k = normal(x.nombre);
+    const prev = porTitulo.get(k);
+    if (!prev || (x.anio && x.anio < prev.anio)) porTitulo.set(k, x);
+  }
+  return { artista: art, discos: [...porTitulo.values()].sort((a, b) => a.anio - b.anio) };
+}
+
+// Buscar cualquier disco (dos páginas de 10, el máximo que deja Spotify en modo desarrollador).
+export async function buscarDiscos(q) {
+  const enc = encodeURIComponent(q);
+  const [a, b] = await Promise.all([
+    api(`/search?type=album&limit=10&offset=0&q=${enc}`),
+    api(`/search?type=album&limit=10&offset=10&q=${enc}`).catch(() => ({})),
+  ]);
+  const items = [...(a.albums?.items ?? []), ...(b.albums?.items ?? [])].filter(Boolean).map(resumen);
+  const vistos = new Set();
+  return items.filter((x) => (vistos.has(x.id) ? false : vistos.add(x.id)));
 }
 
 export async function buscarCancion(titulo, artista) {
@@ -124,6 +182,9 @@ export default async function handler(req, res) {
     if (tipo === 'album' && titulo && artista) datos = await buscarAlbum(String(titulo), String(artista), anio);
     else if (tipo === 'artista' && nombre) datos = await buscarArtista(String(nombre));
     else if (tipo === 'cancion' && titulo && artista) datos = await buscarCancion(String(titulo), String(artista));
+    else if (tipo === 'disco' && req.query.id) datos = await discoPorId(String(req.query.id));
+    else if (tipo === 'discografia' && nombre) datos = await discografia(String(nombre));
+    else if (tipo === 'buscar' && req.query.q && String(req.query.q).trim().length >= 2) datos = await buscarDiscos(String(req.query.q).slice(0, 80));
     else return res.status(400).json({ error: 'Faltan parámetros' });
     if (!datos) return res.status(404).json({ error: 'No está en Spotify' });
     // Vercel guarda la respuesta un día: menos llamadas a Spotify y respuestas más rápidas.

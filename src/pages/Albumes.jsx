@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import BuscarDiscos from '../components/BuscarDiscos';
 import ImagenWiki from '../components/ImagenWiki';
 import { Migas } from '../components/Nav';
 import { Dato } from '../components/Recuadros';
@@ -62,6 +63,8 @@ export default function Albumes() {
         <h1 className="titulo-seccion">Álbumes</h1>
         <p>Los discos que definieron el sonido, ordenados por año: de Criminal Minded (1987) a good kid, m.A.A.d city (2012).</p>
       </header>
+      <BuscarDiscos />
+      <h2 className="subtitulo-lista">Los clásicos del archivo</h2>
       <div className="con-selector">
         <div className="lista-fichas">
           {visibles.map((d) => (

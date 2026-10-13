@@ -6,6 +6,7 @@ import { completarConexion } from './services/spotifyCuenta';
 import useRuta from './hooks/useRuta';
 import Album from './pages/Album';
 import Albumes from './pages/Albumes';
+import AlbumSp from './pages/AlbumSp';
 import Artista from './pages/Artista';
 import Artistas from './pages/Artistas';
 import Cajon from './pages/Cajon';
@@ -31,6 +32,7 @@ export default function App() {
 
   let pagina;
   if (seccion === 'artistas') pagina = id ? <Artista key={id} id={id} /> : <Artistas />;
+  else if (seccion === 'albumes' && id === 'sp' && sub) pagina = <AlbumSp key={sub} id={sub} />;
   else if (seccion === 'albumes') pagina = id ? <Album key={id} id={id} /> : <Albumes />;
   else if (seccion === 'historia') pagina = <Historia />;
   else if (seccion === 'cajon' && id === 'playlists') pagina = sub ? <Playlist key={sub} id={sub} /> : <Playlists />;

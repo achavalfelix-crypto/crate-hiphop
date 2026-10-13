@@ -35,5 +35,11 @@ export const artistaSpotify = (nombre) => pedir({ tipo: 'artista', nombre });
 
 export const cancionSpotify = (titulo, artista) => pedir({ tipo: 'cancion', titulo, artista });
 
+export const discoSpotify = (id) => pedir({ tipo: 'disco', id });
+
+export const discografiaSpotify = (nombre) => pedir({ tipo: 'discografia', nombre });
+
+export const buscarDiscosSpotify = (q) => pedir({ tipo: 'buscar', q });
+
 // 232 → "3:52"
 export const minutos = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;

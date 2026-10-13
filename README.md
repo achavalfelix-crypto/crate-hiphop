@@ -9,8 +9,8 @@ Todos los datos del archivo están verificados y cada uno tiene su fuente a la v
 ## Secciones
 
 - **Inicio:** collage con las tapas de todos los álbumes, el propósito de la página y un recorrido en cinco capítulos con los discos más famosos.
-- **Artistas:** 26 fichas con imagen, resumen de Wikipedia, logros, un dato destacado, una cita verificada cuando existe y el reproductor de Spotify con sus temas más escuchados. Se filtran por costa.
-- **Álbumes:** 24 fichas con tapa, fecha de salida, sello, producción y un dato destacado. Cada disco trae **todas sus canciones desde Spotify**, con duración y reproductor: tocás un tema y suena ahí mismo, y con el + lo guardás en Mi cajón.
+- **Artistas:** cada ficha suma la discografía completa del artista desde Spotify. 26 fichas con imagen, resumen de Wikipedia, logros, un dato destacado, una cita verificada cuando existe y el reproductor de Spotify con sus temas más escuchados. Se filtran por costa.
+- **Álbumes:** buscador de cualquier disco de Spotify (cada uno con su página: tapa, todas las canciones, play y "Agregar a mi cajón") y 24 fichas con tapa, fecha de salida, sello, producción y un dato destacado. Cada disco trae **todas sus canciones desde Spotify**, con duración y reproductor: tocás un tema y suena ahí mismo, y con el + lo guardás en Mi cajón.
 - **Historia:** línea de tiempo de 1985 a 2016, cada hito con su fuente.
 - **Mi cajón:** la colección personal (detalle abajo).
 - **Playlists** (pestaña de Mi cajón): sugerencias armadas con tu cajón (favoritas, un tema por disco, por costa, por década, lo que te falta escuchar), armado a mano (agregar, quitar, ordenar), combinar dos playlists, separar una por costa o por década, y escucharlas tema tras tema. Cada canción lleva a su disco y abajo aparecen "los discos detrás de la playlist" para escucharlos enteros.
@@ -181,5 +181,6 @@ firestore.rules          reglas de seguridad
 - **v11.0** — Playlists: sugerencias, armado a mano, combinar, separar, cola de reproducción con anterior/siguiente y cada tema llevando a su disco. Ver HOJA-DE-RUTA.md para lo que sigue.
 - **v12.0** — Conectar Spotify (demo): guardar y actualizar playlists en la cuenta de Spotify de la persona y sumar a "Mi cajón" en Spotify cada canción que se guarda.
 - **v13.0** — Escuchar completo en la app de Spotify (control remoto con Spotify Connect, sigue con la pantalla apagada) y "Abrir en la app de Spotify" para todos.
+- **v14.0** — Todos los discos: discografía completa de cada artista y buscador de cualquier disco, con su propia página (canciones, play, agregar al cajón). Los 24 del archivo siguen con ficha verificada (★).
 
 Las imágenes de artistas y tapas vienen de Wikipedia. Si no cargan, se muestra una portada generada con el color de la costa.

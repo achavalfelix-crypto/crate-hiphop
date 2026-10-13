@@ -304,3 +304,9 @@ export const albumPorTitulo = (titulo) => {
   const t = normalTitulo(titulo);
   return t ? ALBUMES.find((a) => normalTitulo(a.titulo) === t) : undefined;
 };
+
+// Busca un artista del archivo por nombre (sin importar mayúsculas, tildes ni signos).
+export const artistaPorNombre = (nombre) => {
+  const n = normalTitulo(nombre);
+  return n ? ARTISTAS.find((a) => normalTitulo(a.nombre) === n) : undefined;
+};

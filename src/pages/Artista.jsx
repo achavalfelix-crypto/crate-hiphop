@@ -1,4 +1,5 @@
 import ArtistaSpotify from '../components/ArtistaSpotify';
+import Discografia from '../components/Discografia';
 import ImagenWiki from '../components/ImagenWiki';
 import { Migas } from '../components/Nav';
 import { Cita, Dato } from '../components/Recuadros';
@@ -94,6 +95,8 @@ export default function Artista({ id }) {
           </ul>
         </section>
       )}
+
+      <Discografia nombre={a.nombre} />
     </div>
   );
 }
