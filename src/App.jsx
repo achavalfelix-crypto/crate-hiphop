@@ -10,11 +10,13 @@ import Artistas from './pages/Artistas';
 import Cajon from './pages/Cajon';
 import Historia from './pages/Historia';
 import Inicio from './pages/Inicio';
+import Playlist from './pages/Playlist';
+import Playlists from './pages/Playlists';
 
 const TITULOS = { artistas: 'Artistas', albumes: 'Álbumes', historia: 'Historia', cajon: 'Mi cajón' };
 
 export default function App() {
-  const [seccion = '', id] = useRuta();
+  const [seccion = '', id, sub] = useRuta();
 
   useEffect(() => {
     document.title = TITULOS[seccion] ? `${TITULOS[seccion]} · ${NOMBRE}` : NOMBRE;
@@ -24,6 +26,7 @@ export default function App() {
   if (seccion === 'artistas') pagina = id ? <Artista key={id} id={id} /> : <Artistas />;
   else if (seccion === 'albumes') pagina = id ? <Album key={id} id={id} /> : <Albumes />;
   else if (seccion === 'historia') pagina = <Historia />;
+  else if (seccion === 'cajon' && id === 'playlists') pagina = sub ? <Playlist key={sub} id={sub} /> : <Playlists />;
   else if (seccion === 'cajon') pagina = <Cajon />;
   else pagina = <Inicio />;
 

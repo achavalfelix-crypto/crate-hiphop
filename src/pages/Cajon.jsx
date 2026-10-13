@@ -5,6 +5,7 @@ import Aviso from '../components/Aviso';
 import BotonImportar from '../components/BotonImportar';
 import CajonVacio from '../components/CajonVacio';
 import Filtros from '../components/Filtros';
+import TabsCajon from '../components/playlists/TabsCajon';
 import LineaDeTiempo from '../components/LineaDeTiempo';
 import { CATALOGO } from '../data/catalogo';
 import { normalizar } from '../data/constantes';
@@ -164,6 +165,8 @@ export default function Cajon() {
           </p>
         )}
       </header>
+
+      <TabsCajon activa="coleccion" />
 
       <section className="seccion-linea" aria-label="Línea de tiempo por año">
         <LineaDeTiempo

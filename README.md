@@ -13,6 +13,7 @@ Todos los datos del archivo están verificados y cada uno tiene su fuente a la v
 - **Álbumes:** 24 fichas con tapa, fecha de salida, sello, producción y un dato destacado. Cada disco trae **todas sus canciones desde Spotify**, con duración y reproductor: tocás un tema y suena ahí mismo, y con el + lo guardás en Mi cajón.
 - **Historia:** línea de tiempo de 1985 a 2016, cada hito con su fuente.
 - **Mi cajón:** la colección personal (detalle abajo).
+- **Playlists** (pestaña de Mi cajón): sugerencias armadas con tu cajón (favoritas, un tema por disco, por costa, por década, lo que te falta escuchar), armado a mano (agregar, quitar, ordenar), combinar dos playlists, separar una por costa o por década, y escucharlas tema tras tema. Cada canción lleva a su disco y abajo aparecen "los discos detrás de la playlist" para escucharlos enteros.
 - **Reproductor:** una barra fija abajo que hace sonar cualquier disco o canción adentro de la página (Spotify o YouTube) y sigue sonando al cambiar de sección. No hace falta tener ninguna app instalada.
 - **App para el celular:** se instala desde el navegador (Android: botón "Instalar la app" al pie; iPhone: Compartir → Agregar a inicio) y abre en pantalla completa con su ícono.
 
@@ -105,6 +106,8 @@ La página usa Spotify sin pedirle a nadie que inicie sesión, así la puede usa
 
 Sin cuenta de Spotify, el reproductor pasa fragmentos; con la cuenta abierta en el navegador, los temas completos.
 
+Las playlists se guardan en `users/{uid}/playlists/{playlistId}` con `nombre`, `descripcion` y `canciones` (hasta 100; cada una con título, artista, disco, año, costa, spotifyId y videoId).
+
 ## Reglas de Firestore
 
 Copiar el contenido de `firestore.rules` en Firebase Console → Firestore Database → Reglas, y publicar.
@@ -160,5 +163,6 @@ firestore.rules          reglas de seguridad
 - **v8.0** — Spotify: lista completa de canciones y reproductor en cada disco y artista, guardar temas en Mi cajón con un toque, y logo en tipografía de graffiti.
 - **v9.0** — Fondo de noche con grano y una luz que toma el color de la costa; fichas que se levantan, foto que se enciende al pasar el mouse, toda la ficha se puede tocar, transición animada de la lista a la ficha y un vinilo que sale de la funda y gira cuando suena un tema.
 - **v10.0** — Reproductor propio de la página (Spotify y YouTube, sin salir del sitio), play en cada canción del cajón con búsqueda automática, favoritas con filtro, discos que se guardan con todas sus canciones y app instalable en el celular.
+- **v11.0** — Playlists: sugerencias, armado a mano, combinar, separar, cola de reproducción con anterior/siguiente y cada tema llevando a su disco. Ver HOJA-DE-RUTA.md para lo que sigue.
 
 Las imágenes de artistas y tapas vienen de Wikipedia. Si no cargan, se muestra una portada generada con el color de la costa.

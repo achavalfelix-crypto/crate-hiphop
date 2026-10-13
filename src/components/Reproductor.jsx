@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { cerrarReproductor, useReproductor } from '../services/reproductor';
+import { anterior, cerrarReproductor, siguiente, useCola, useReproductor } from '../services/reproductor';
 
 // Carga una sola vez la API del reproductor de Spotify (permite cambiar de tema y darle play con un toque).
 let apiSpotify = null;
@@ -22,10 +22,12 @@ function cargarApiSpotify() {
 function Spotify({ pista }) {
   const caja = useRef(null);
   const control = useRef(null);
+  const terminado = useRef(false);
   const uri = `spotify:${pista.tipo}:${pista.id}`;
 
   useEffect(() => {
     let vivo = true;
+    terminado.current = false;
     if (control.current) {
       control.current.loadUri(uri);
       control.current.play();
@@ -39,6 +41,14 @@ function Spotify({ pista }) {
         api.createController(lugar, { uri, width: '100%', height: 80 }, (c) => {
           control.current = c;
           c.addListener('ready', () => c.play());
+          // Cuando termina un tema de una playlist, pasa solo al siguiente.
+          c.addListener('playback_update', (e) => {
+            const { position, duration, isPaused } = e.data ?? {};
+            if (!terminado.current && duration > 0 && position >= duration - 800 && !isPaused) {
+              terminado.current = true;
+              setTimeout(siguiente, 400);
+            }
+          });
         });
       })
       .catch(() => {
@@ -79,6 +89,7 @@ function YouTube({ pista }) {
 // Barra fija abajo: lo que está sonando en cualquier parte de la página.
 export default function Reproductor() {
   const pista = useReproductor();
+  const cola = useCola();
 
   useEffect(() => {
     document.body.classList.toggle('con-reproductor', Boolean(pista));
@@ -89,6 +100,24 @@ export default function Reproductor() {
 
   return (
     <section className={`reproductor fuente-${pista.fuente}`} aria-label="Reproductor">
+      {cola && (
+        <div className="reproductor-cola">
+          <button type="button" onClick={anterior} disabled={cola.indice === 0} aria-label="Tema anterior">
+            ⏮
+          </button>
+          <p>
+            <strong>{cola.nombre}</strong> · {cola.indice + 1} de {cola.canciones.length}
+          </p>
+          <button
+            type="button"
+            onClick={siguiente}
+            disabled={cola.indice >= cola.canciones.length - 1}
+            aria-label="Tema siguiente"
+          >
+            ⏭
+          </button>
+        </div>
+      )}
       <div className="reproductor-interior">
         <div className="reproductor-cuerpo">
           {pista.fuente === 'buscando' && (

@@ -12,36 +12,37 @@ import { useSyncExternalStore } from 'react';
 import { cancionSpotify } from './spotify';
 
 let actual = null;
-let buscando = false;
+let cola = null; // { nombre, canciones, indice } cuando suena una playlist
 const oyentes = new Set();
 
 function avisar() {
   oyentes.forEach((f) => f());
 }
 
-export function reproducir(pista) {
+export function reproducir(pista, { deCola = false } = {}) {
+  if (!deCola) cola = null;
   actual = pista;
-  buscando = false;
   avisar();
 }
 
 export function cerrarReproductor() {
   actual = null;
+  cola = null;
   avisar();
 }
 
 // Reproduce una canción del cajón con lo que tenga: Spotify, YouTube o, si no tiene nada,
 // la busca en Spotify por título y artista. Devuelve el ID de Spotify si lo encontró.
-export async function reproducirCancion({ titulo, artista, spotifyId, videoId }) {
+export async function reproducirCancion({ titulo, artista, spotifyId, videoId }, { deCola = false } = {}) {
+  if (!deCola) cola = null;
   if (spotifyId) {
-    reproducir({ fuente: 'spotify', tipo: 'track', id: spotifyId, titulo, artista });
+    reproducir({ fuente: 'spotify', tipo: 'track', id: spotifyId, titulo, artista }, { deCola: true });
     return spotifyId;
   }
   if (videoId) {
-    reproducir({ fuente: 'youtube', id: videoId, titulo, artista });
+    reproducir({ fuente: 'youtube', id: videoId, titulo, artista }, { deCola: true });
     return '';
   }
-  buscando = true;
   actual = { fuente: 'buscando', titulo, artista };
   avisar();
   try {
@@ -50,17 +51,45 @@ export async function reproducirCancion({ titulo, artista, spotifyId, videoId })
     if (!c) {
       actual = { fuente: 'no-encontrada', titulo, artista };
       avisar();
+      if (cola) setTimeout(siguiente, 1500); // en una playlist, salta a la próxima
       return '';
     }
-    reproducir({ fuente: 'spotify', tipo: 'track', id: c.id, titulo, artista });
+    reproducir({ fuente: 'spotify', tipo: 'track', id: c.id, titulo, artista }, { deCola: true });
     return c.id;
   } catch {
     actual = { fuente: 'error', titulo, artista };
     avisar();
     return '';
-  } finally {
-    buscando = false;
   }
+}
+
+// ── Cola: una playlist que suena tema tras tema ──
+function tocarActual() {
+  const c = cola.canciones[cola.indice];
+  reproducirCancion(c, { deCola: true });
+}
+
+export function reproducirCola(nombre, canciones, indice = 0) {
+  if (!canciones.length) return;
+  cola = { nombre, canciones, indice };
+  tocarActual();
+}
+
+export function siguiente() {
+  if (!cola || cola.indice >= cola.canciones.length - 1) return false;
+  cola = { ...cola, indice: cola.indice + 1 };
+  tocarActual();
+  return true;
+}
+
+export function anterior() {
+  if (!cola || cola.indice === 0) return;
+  cola = { ...cola, indice: cola.indice - 1 };
+  tocarActual();
+}
+
+export function useCola() {
+  return useSyncExternalStore(suscribir, () => cola);
 }
 
 const suscribir = (f) => {
@@ -72,4 +101,3 @@ export function useReproductor() {
   return useSyncExternalStore(suscribir, () => actual);
 }
 
-export const estaBuscando = () => buscando;

@@ -297,3 +297,10 @@ export const artistaPorId = (id) => ARTISTAS.find((a) => a.id === id);
 export const albumPorId = (id) => ALBUMES.find((a) => a.id === id);
 export const albumesDe = (artistaId) => ALBUMES.filter((a) => a.artista === artistaId);
 export const autorDe = (d) => d.autor ?? artistaPorId(d.artista)?.nombre ?? '';
+
+// Busca un disco del archivo por título (sin importar mayúsculas, tildes ni signos).
+const normalTitulo = (t) => (t ?? '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]/g, '');
+export const albumPorTitulo = (titulo) => {
+  const t = normalTitulo(titulo);
+  return t ? ALBUMES.find((a) => normalTitulo(a.titulo) === t) : undefined;
+};
