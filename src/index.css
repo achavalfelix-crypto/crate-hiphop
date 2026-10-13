@@ -2691,3 +2691,37 @@ body.con-reproductor:has(.donde-suena) {
   display: block;
   background: var(--papel);
 }
+
+/* ── v14.1: todos los discos en Álbumes ── */
+.todos-discos {
+  margin-bottom: 40px;
+}
+.todos-discos .nota-fuente {
+  margin: -6px 0 14px;
+}
+.filtros-discos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.filtros-discos select,
+.filtros-discos input {
+  flex: 1 1 200px;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--linea);
+  border-radius: 4px;
+  background: var(--papel);
+  color: var(--tinta);
+  font: inherit;
+}
+.grilla-anio .muestra {
+  width: 8px;
+  height: 8px;
+  margin-right: 2px;
+}
+.ver-mas {
+  margin-top: 18px;
+  text-align: center;
+}
