@@ -77,7 +77,7 @@ export default function Inicio() {
           <div className="proposito-texto">
             <p>
               {NOMBRE} es un archivo del rap que nació en las calles de Estados Unidos entre 1980 y 2016. Está hecho para
-              quienes pusieron play a Dr. Dre, a Nas o a 2Pac y se quedaron con ganas de saber más: quiénes eran, de dónde
+              quienes escucharon a Dr. Dre, a Nas o a 2Pac, les gustó y se quedaron con ganas de saber más: quiénes eran, de dónde
               salieron, qué ganaron y por qué esos discos todavía suenan.
             </p>
             <p>
