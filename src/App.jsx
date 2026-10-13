@@ -2,11 +2,13 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import AlbumForm from './components/AlbumForm';
 import AlbumList from './components/AlbumList';
 import Aviso from './components/Aviso';
+import BotonImportar from './components/BotonImportar';
 import CajonVacio from './components/CajonVacio';
 import Filtros from './components/Filtros';
 import LineaDeTiempo from './components/LineaDeTiempo';
 import { CATALOGO } from './data/catalogo';
 import { normalizar } from './data/constantes';
+import { prepararImportacion } from './data/importar';
 import { firebaseConfigurado } from './firebase';
 import {
   actualizarAlbum,
@@ -73,6 +75,30 @@ export default function App() {
   }
 
   const cerrarAviso = useCallback(() => setAviso(null), []);
+
+  // IMPORTAR: lee un archivo JSON, descarta repetidos e inválidos y guarda el resto.
+  async function importar(archivo) {
+    let resultado;
+    try {
+      resultado = await prepararImportacion(archivo, albums);
+    } catch (err) {
+      setAviso({ tipo: 'error', texto: err.message });
+      return;
+    }
+    const { nuevas, repetidas, invalidas } = resultado;
+    const extra = [repetidas && `${repetidas} ya estaban`, invalidas && `${invalidas} con datos inválidos`]
+      .filter(Boolean)
+      .join(', ');
+    if (nuevas.length === 0) {
+      setAviso({ tipo: 'error', texto: `No hay nada nuevo para importar${extra ? ` (${extra})` : ''}.` });
+      return;
+    }
+    await ejecutar(
+      () => cargarCatalogo(uid, nuevas),
+      `${nuevas.length} importados${extra ? `; ${extra}` : ''}.`,
+      'No se pudo importar el archivo. Probá de nuevo.',
+    );
+  }
 
   function abrirForm() {
     setFormAbierto(true);
@@ -160,6 +186,7 @@ export default function App() {
               <CajonVacio
                 cantidad={CATALOGO.length}
                 onAgregarAMano={abrirForm}
+                onImportar={importar}
                 onCargarCatalogo={() =>
                   ejecutar(
                     () => cargarCatalogo(uid, CATALOGO),
@@ -179,9 +206,12 @@ export default function App() {
                   conteoTipos={conteoTipos}
                 />
                 {!formAbierto && (
-                  <button type="button" className="btn btn-primario" onClick={abrirForm}>
-                    Agregar
-                  </button>
+                  <div className="barra-acciones">
+                    <button type="button" className="btn btn-primario" onClick={abrirForm}>
+                      Agregar
+                    </button>
+                    <BotonImportar onArchivo={importar} />
+                  </div>
                 )}
               </div>
             )}

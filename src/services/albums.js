@@ -80,17 +80,20 @@ export function actualizarAlbum(uid, album, cambios) {
   });
 }
 
-// AGREGAR VARIOS: carga el catálogo inicial en una sola operación (todo o nada).
-export function cargarCatalogo(uid, lista) {
-  const lote = writeBatch(db);
-  lista.forEach((datos) => {
-    lote.set(doc(albumsRef(uid)), {
-      ...datos,
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
+// AGREGAR VARIOS: guarda una lista (catálogo inicial o archivo importado) en lotes.
+// Cada lote es todo o nada; Firestore admite hasta 500 escrituras por lote.
+export async function cargarCatalogo(uid, lista) {
+  for (let i = 0; i < lista.length; i += 400) {
+    const lote = writeBatch(db);
+    lista.slice(i, i + 400).forEach((datos) => {
+      lote.set(doc(albumsRef(uid)), {
+        ...datos,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      });
     });
-  });
-  return lote.commit();
+    await lote.commit();
+  }
 }
 
 // ELIMINAR

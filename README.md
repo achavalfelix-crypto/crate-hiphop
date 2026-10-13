@@ -13,6 +13,7 @@ Aplicación web para armar tu propio cajón de discos y canciones de rap gangste
 - Línea de tiempo 1980–2016: cada disco o canción es un bloque en su año (las canciones, más bajos), con el color de su costa y el relleno según su estado. Tocar un año filtra la lista.
 - Búsqueda por disco, canción o artista, y filtros por tipo, costa y estado.
 - Catálogo inicial opcional de 23 discos clave, para no arrancar con el cajón vacío.
+- Importar una lista desde un archivo JSON: valida cada entrada y saltea las que ya están en el cajón.
 - Mensajes de carga, éxito y error en cada operación.
 
 ## Tecnologías
@@ -74,6 +75,18 @@ Copiar el contenido de `firestore.rules` en Firebase Console → Firestore Datab
 3. Cargar las 4 variables `VITE_FIREBASE_*` en Settings → Environment Variables (Production).
 4. Desplegar. Si cambian las variables, hacer Redeploy.
 
+## Formato para importar
+
+Una lista JSON de entradas; las que tengan datos inválidos o ya existan (mismo tipo, título y artista) se saltean:
+
+```json
+[
+  { "type": "album", "title": "Illmatic", "artist": "Nas", "year": 1994, "coast": "east",
+    "status": "escuchado", "rating": 5, "tracks": [{ "title": "N.Y. State of Mind", "fav": true }] },
+  { "type": "cancion", "title": "No Tears", "artist": "Scarface", "album": "The Diary", "year": 1994, "coast": "south" }
+]
+```
+
 ## Estructura
 
 ```
@@ -93,5 +106,6 @@ firestore.rules          reglas de seguridad
 - **v2.0** — Costa, tres estados, puntaje, canciones, filtros, edición, avisos y reglas con validación.
 - **v3.0** — Diseño final, línea de tiempo, búsqueda, catálogo inicial, confirmación al eliminar y versión para celular.
 - **v4.0** — Canciones sueltas además de discos: selector Disco/Canción, filtro por tipo, portada redonda y bloque bajo en la línea de tiempo.
+- **v5.0** — Importar desde un archivo JSON (por ejemplo, una lista armada a partir del historial de YouTube Music), sin duplicar lo que ya está.
 
 Las portadas son generadas con tipografía (color de la costa + inicial). No se usan tapas reales.

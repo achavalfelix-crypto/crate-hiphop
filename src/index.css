@@ -719,3 +719,15 @@ select {
     font-size: 1.125rem;
   }
 }
+
+/* ───────── v5: importar ───────── */
+.barra-acciones {
+  display: flex;
+  gap: 8px;
+  flex: none;
+}
+@media (max-width: 720px) {
+  .barra-acciones > .btn {
+    flex: 1;
+  }
+}
