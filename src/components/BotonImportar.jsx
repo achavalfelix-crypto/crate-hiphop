@@ -17,7 +17,7 @@ export default function BotonImportar({ onArchivo, className = 'btn' }) {
   return (
     <>
       <button type="button" className={className} disabled={importando} onClick={() => input.current?.click()}>
-        {importando ? 'Importando…' : 'Importar'}
+        {importando ? 'Importando…' : className === 'btn-texto' ? 'Importar una lista (JSON)' : 'Importar'}
       </button>
       <input
         ref={input}

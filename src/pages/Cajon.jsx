@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import AgregarRapido from '../components/AgregarRapido';
 import AlbumForm from '../components/AlbumForm';
 import AlbumList from '../components/AlbumList';
 import Aviso from '../components/Aviso';
@@ -156,13 +157,11 @@ export default function Cajon() {
           <p>Tus discos y canciones de la era dorada: lo que escuchaste, lo que te falta y lo que más te gustó.</p>
         </div>
         {albums.length > 0 && (
-          <p className="contador">
-            <strong>{discos}</strong> {discos === 1 ? 'disco' : 'discos'}
-            <br />
-            <strong>{canciones}</strong> {canciones === 1 ? 'canción' : 'canciones'}
-            <br />
-            <strong>{escuchados}</strong> {escuchados === 1 ? 'escuchado' : 'escuchados'}
-          </p>
+          <ul className="stats-cajon" aria-label="Resumen del cajón">
+            <li><strong>{discos}</strong> {discos === 1 ? 'disco' : 'discos'}</li>
+            <li><strong>{canciones}</strong> {canciones === 1 ? 'canción' : 'canciones'}</li>
+            <li><strong>{escuchados}</strong> {escuchados === 1 ? 'escuchado' : 'escuchados'}</li>
+          </ul>
         )}
       </header>
 
@@ -178,8 +177,7 @@ export default function Cajon() {
           <span className="bloque-muestra estado-escuchado" /> Escuchado
           <span className="bloque-muestra estado-escuchando" /> Escuchando
           <span className="bloque-muestra estado-pendiente" /> Por escuchar
-          <span className="bloque-muestra bloque-muestra-cancion estado-escuchado" /> Canción (bloque bajo)
-          <span className="leyenda-ayuda">Tocá un año para filtrarlo.</span>
+          <span className="leyenda-ayuda">Cada barrita es un disco o canción, del color de su costa. Tocá un año para filtrarlo.</span>
         </p>
       </section>
 
@@ -209,6 +207,27 @@ export default function Cajon() {
               />
             )}
 
+            {uid && (
+              <AgregarRapido
+                onAMano={abrirForm}
+                extra={<BotonImportar onArchivo={importar} className="btn-texto" />}
+                yaEsta={(item, tipo) =>
+                  albums.some(
+                    (a) =>
+                      a.spotifyId === item.id ||
+                      (a.type === tipo && a.title.toLowerCase() === item.nombre.toLowerCase() && a.artist.toLowerCase() === item.artista.toLowerCase()),
+                  )
+                }
+                onAgregar={(datos) =>
+                  ejecutar(
+                    () => agregarAlbum(uid, { ...datos, status: 'pendiente', rating: 0 }),
+                    `“${datos.title}” ${datos.type === 'cancion' ? 'agregada' : 'agregado'} a tu cajón.`,
+                    'No se pudo agregar. Probá de nuevo.',
+                  )
+                }
+              />
+            )}
+
             {!vacio && (
               <div className="barra">
                 <Filtros
@@ -217,14 +236,6 @@ export default function Cajon() {
                   conteoCostas={conteoCostas}
                   conteoTipos={conteoTipos}
                 />
-                {!formAbierto && (
-                  <div className="barra-acciones">
-                    <button type="button" className="btn btn-primario" onClick={abrirForm}>
-                      Agregar
-                    </button>
-                    <BotonImportar onArchivo={importar} />
-                  </div>
-                )}
               </div>
             )}
 

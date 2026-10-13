@@ -59,21 +59,19 @@ export default function Filtros({ filtros, onCambiar, conteoCostas, conteoTipos 
         ♥ Favoritas
       </button>
 
-      <div className="segmentado" role="group" aria-label="Filtrar por estado">
-        <button type="button" aria-pressed={!filtros.estado} onClick={() => set('estado', '')}>
-          Todos
-        </button>
+      <select
+        className="filtro-estado"
+        aria-label="Filtrar por estado"
+        value={filtros.estado}
+        onChange={(e) => set('estado', e.target.value)}
+      >
+        <option value="">Todos los estados</option>
         {ESTADOS.map((e) => (
-          <button
-            key={e.id}
-            type="button"
-            aria-pressed={filtros.estado === e.id}
-            onClick={() => set('estado', e.id)}
-          >
+          <option key={e.id} value={e.id}>
             {e.nombre}
-          </button>
+          </option>
         ))}
-      </div>
+      </select>
     </div>
   );
 }

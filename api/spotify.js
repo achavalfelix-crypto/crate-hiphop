@@ -164,8 +164,33 @@ export async function buscarCancion(titulo, artista) {
     nombre: x.name,
     artistas: x.artists.map((y) => y.name),
     disco: x.album?.name ?? '',
+    tapa: x.album?.images?.[1]?.url ?? x.album?.images?.[0]?.url ?? '',
     duracion: Math.round(x.duration_ms / 1000),
   };
+}
+
+// Buscar canciones sueltas (para agregarlas al cajón sin escribir nada).
+export async function buscarCanciones(q) {
+  const enc = encodeURIComponent(q);
+  const [a, b] = await Promise.all([
+    api(`/search?type=track&limit=10&offset=0&q=${enc}`),
+    api(`/search?type=track&limit=10&offset=10&q=${enc}`).catch(() => ({})),
+  ]);
+  const vistos = new Set();
+  return [...(a.tracks?.items ?? []), ...(b.tracks?.items ?? [])]
+    .filter(Boolean)
+    .filter((x) => (vistos.has(x.id) ? false : vistos.add(x.id)))
+    .map((x) => ({
+      id: x.id,
+      nombre: x.name,
+      artista: x.artists.map((y) => y.name).join(', '),
+      artistaPrincipal: x.artists[0]?.name ?? '',
+      disco: x.album?.name ?? '',
+      discoId: x.album?.id ?? '',
+      anio: Number(String(x.album?.release_date ?? '').slice(0, 4)) || 0,
+      tapa: x.album?.images?.[2]?.url ?? x.album?.images?.[1]?.url ?? x.album?.images?.[0]?.url ?? '',
+      duracion: Math.round(x.duration_ms / 1000),
+    }));
 }
 
 export async function buscarArtista(nombre) {
@@ -192,6 +217,7 @@ export default async function handler(req, res) {
     else if (tipo === 'cancion' && titulo && artista) datos = await buscarCancion(String(titulo), String(artista));
     else if (tipo === 'disco' && req.query.id) datos = await discoPorId(String(req.query.id));
     else if (tipo === 'discografia' && nombre) datos = await discografia(String(nombre));
+    else if (tipo === 'buscarcanciones' && req.query.q && String(req.query.q).trim().length >= 2) datos = await buscarCanciones(String(req.query.q).slice(0, 80));
     else if (tipo === 'buscar' && req.query.q && String(req.query.q).trim().length >= 2) datos = await buscarDiscos(String(req.query.q).slice(0, 80));
     else return res.status(400).json({ error: 'Faltan parámetros' });
     if (!datos) return res.status(404).json({ error: 'No está en Spotify' });

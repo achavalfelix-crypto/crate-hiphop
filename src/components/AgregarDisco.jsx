@@ -5,7 +5,7 @@ import { agregarAlbum, iniciarSesion } from '../services/albums';
 // "Agregar a mi cajón" para un disco que viene de Spotify (con todas sus canciones).
 export default function AgregarDisco({ datos, autor, costa }) {
   const [estado, setEstado] = useState('listo');
-  const anio = Math.min(2016, Math.max(1980, datos.anio || 1980));
+  const anio = datos.anio || 1980;
 
   async function agregar() {
     setEstado('guardando');

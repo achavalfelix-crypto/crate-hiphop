@@ -1,15 +1,18 @@
 import { useState } from 'react';
 import { ESTADOS, nombreCosta } from '../data/constantes';
+import { link } from '../hooks/useRuta';
+import { reproducir } from '../services/reproductor';
+import { formatoDuracion } from '../services/youtube';
 import AlbumForm from './AlbumForm';
 import BotonPlay from './BotonPlay';
-import { reproducir } from '../services/reproductor';
 import Canciones from './Canciones';
 import DatosYouTube from './DatosYouTube';
-import { formatoDuracion } from '../services/youtube';
 import Portada from './Portada';
 import Puntaje from './Puntaje';
+import { discoDelArchivo } from '../data/archivo';
+import TapaCajon from './TapaCajon';
 
-// Una fila de la lista: puede ser un disco (con sus canciones) o una canción suelta.
+// Una tarjeta del cajón: un disco (con sus canciones) o una canción suelta.
 export default function AlbumItem({ album, onActualizar, onEliminar, yt = {} }) {
   const [abierto, setAbierto] = useState(false);
   const [editando, setEditando] = useState(false);
@@ -18,12 +21,13 @@ export default function AlbumItem({ album, onActualizar, onEliminar, yt = {} }) 
   const esCancion = album.type === 'cancion';
   const actualizar = (cambios) => onActualizar(album, cambios);
   const favoritas = album.tracks.filter((t) => t.fav).length;
-  // Duración total de las canciones del disco que tienen video.
   const totalDisco = album.tracks.reduce((s, t) => s + (yt[t.videoId]?.duracion ?? 0), 0);
+  // Si es uno de los discos del archivo, se muestra un poco de su historia (dato verificado).
+  const arch = discoDelArchivo(album);
 
   if (editando) {
     return (
-      <li className="album editando">
+      <li className="album album-tarjeta editando">
         <Portada album={album} />
         <AlbumForm
           inicial={album}
@@ -39,92 +43,87 @@ export default function AlbumItem({ album, onActualizar, onEliminar, yt = {} }) 
   }
 
   return (
-    <li className={`album estado-${album.status} tipo-${album.type}`}>
-      <Portada album={album} />
+    <li className={`album album-tarjeta costa-${album.coast} estado-${album.status} tipo-${album.type}`}>
+      <TapaCajon album={album} />
 
-      <div className="album-cuerpo">
-        <div className="album-datos">
-          <h3>
-            {album.title}
-            <button
-              type="button"
-              className={`btn-corazon ${album.favorita ? 'activo' : ''}`}
-              aria-pressed={album.favorita}
-              aria-label={album.favorita ? `Quitar ${album.title} de favoritas` : `Marcar ${album.title} como favorita`}
-              onClick={() => actualizar({ favorita: !album.favorita })}
-            >
-              {album.favorita ? '♥' : '♡'}
-            </button>
-          </h3>
-          <p className="album-artista">{album.artist}</p>
-          <p className="album-meta">
-            <span className={`muestra costa-${album.coast}`} />
-            {esCancion ? 'Canción' : 'Disco'}, {nombreCosta(album.coast)}, {album.year}
-          </p>
-          {esCancion && album.album && (
-            <p className="album-de">
-              Del disco <em>{album.album}</em>
+      <div className="at-cuerpo">
+        <div className="at-cabeza">
+          <div>
+            <h3>{album.title}</h3>
+            <p className="album-artista">{album.artist}</p>
+            <p className="album-meta">
+              <span className={`muestra costa-${album.coast}`} />
+              {esCancion ? 'Canción' : 'Disco'} · {nombreCosta(album.coast)} · {album.year}
+              {esCancion && album.album && (
+                <>
+                  {' · '}del disco <em>{album.album}</em>
+                </>
+              )}
             </p>
-          )}
-          {esCancion && (
-            <div className="album-play">
-              <BotonPlay
-                titulo={album.title}
-                artista={album.artist}
-                spotifyId={album.spotifyId}
-                videoId={album.videoId}
-                onEncontrada={(spotifyId) => actualizar({ spotifyId })}
-              />
-              <DatosYouTube videoId={album.videoId} datos={yt} />
-            </div>
-          )}
-          {!esCancion && album.spotifyId && (
-            <div className="album-play">
-              <button
-                type="button"
-                className="btn-play"
-                onClick={() =>
-                  reproducir({ fuente: 'spotify', tipo: 'album', id: album.spotifyId, titulo: album.title, artista: album.artist })
-                }
-              >
-                <span aria-hidden="true">▶</span> <span>Escuchar el disco</span>
-              </button>
-            </div>
-          )}
-          {!esCancion && totalDisco > 0 && (
-            <p className="yt">
-              <span className="yt-duracion">{formatoDuracion(totalDisco)}</span>
-              <span className="yt-nota">en {album.tracks.filter((t) => yt[t.videoId]).length} canciones</span>
-            </p>
-          )}
+          </div>
+          <button
+            type="button"
+            className={`btn-corazon ${album.favorita ? 'activo' : ''}`}
+            aria-pressed={album.favorita}
+            aria-label={album.favorita ? `Quitar ${album.title} de favoritas` : `Marcar ${album.title} como favorita`}
+            onClick={() => actualizar({ favorita: !album.favorita })}
+          >
+            {album.favorita ? '♥' : '♡'}
+          </button>
         </div>
 
-        <div className="album-controles">
-          <div className="segmentado segmentado-chico" role="group" aria-label={`Estado de ${album.title}`}>
-            {ESTADOS.map((e) => (
-              <button
-                key={e.id}
-                type="button"
-                aria-pressed={album.status === e.id}
-                onClick={() => album.status !== e.id && actualizar({ status: e.id })}
-              >
-                {e.nombre}
-              </button>
-            ))}
-          </div>
+        {arch && (
+          <p className="at-historia">
+            <span className="at-historia-etiqueta">La historia</span> {arch.dato}{' '}
+            <a href={link('albumes', arch.id)}>Ver la ficha</a>
+          </p>
+        )}
+
+        <div className="at-controles">
+          {esCancion ? (
+            <BotonPlay
+              titulo={album.title}
+              artista={album.artist}
+              spotifyId={album.spotifyId}
+              videoId={album.videoId}
+              onEncontrada={(spotifyId) => actualizar({ spotifyId })}
+            />
+          ) : album.spotifyId ? (
+            <button
+              type="button"
+              className="btn-play"
+              onClick={() =>
+                reproducir({ fuente: 'spotify', tipo: 'album', id: album.spotifyId, titulo: album.title, artista: album.artist, discoId: arch?.id })
+              }
+            >
+              <span aria-hidden="true">▶</span> <span>Escuchar</span>
+            </button>
+          ) : null}
+          <label className="at-estado">
+            <span className="sr-only">Estado de {album.title}</span>
+            <select value={album.status} onChange={(e) => actualizar({ status: e.target.value })}>
+              {ESTADOS.map((e) => (
+                <option key={e.id} value={e.id}>
+                  {e.nombre}
+                </option>
+              ))}
+            </select>
+          </label>
           <Puntaje valor={album.rating} onCambiar={(rating) => actualizar({ rating })} />
         </div>
 
+        {esCancion && album.videoId && <DatosYouTube videoId={album.videoId} datos={yt} />}
+        {!esCancion && totalDisco > 0 && (
+          <p className="yt">
+            <span className="yt-duracion">{formatoDuracion(totalDisco)}</span>
+            <span className="yt-nota">en {album.tracks.filter((t) => yt[t.videoId]).length} canciones</span>
+          </p>
+        )}
+
         <div className="album-acciones">
           {!esCancion && (
-            <button
-              type="button"
-              className="btn-texto"
-              aria-expanded={abierto}
-              onClick={() => setAbierto(!abierto)}
-            >
-              {abierto ? 'Ocultar canciones' : 'Canciones'} ({album.tracks.length}
-              {favoritas ? `, ${favoritas} ♥` : ''})
+            <button type="button" className="btn-texto" aria-expanded={abierto} onClick={() => setAbierto(!abierto)}>
+              {abierto ? 'Ocultar canciones' : `Canciones (${album.tracks.length}${favoritas ? `, ${favoritas} ♥` : ''})`}
             </button>
           )}
           <button type="button" className="btn-texto" onClick={() => setEditando(true)}>

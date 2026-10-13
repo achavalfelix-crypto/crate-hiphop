@@ -1,16 +1,21 @@
-import { ANIO_MAX, ANIO_MIN, nombreEstado } from '../data/constantes';
+import { ERA_DESDE, ERA_HASTA, nombreEstado } from '../data/constantes';
 
-const ANIOS = Array.from({ length: ANIO_MAX - ANIO_MIN + 1 }, (_, i) => ANIO_MIN + i);
-
-// Cada disco o canción es un bloque apilado sobre su año (las canciones, más bajos).
-// Color = costa. Relleno = escuchado, rayado = escuchando, contorno = por escuchar.
+// Cada disco o canción es una barrita apilada sobre su año, del color de su costa.
+// Cuanto más llena, más escuchado (escuchado = llena, escuchando = media, por escuchar = tenue).
+// Va de 1980 a 2016 y se estira si hay discos de antes o de después.
 export default function LineaDeTiempo({ albums, anioActivo, onElegirAnio }) {
+  const anios = albums.map((a) => a.year).filter(Boolean);
+  const desde = Math.min(ERA_DESDE, ...anios);
+  const hasta = Math.max(ERA_HASTA, ...anios);
+  const ANIOS = Array.from({ length: hasta - desde + 1 }, (_, i) => desde + i);
   const porAnio = {};
   albums.forEach((a) => (porAnio[a.year] ??= []).push(a));
+  const columnas = { gridTemplateColumns: `repeat(${ANIOS.length}, minmax(0, 1fr))` };
+  const marcas = ANIOS.filter((a) => a === desde || a === hasta || (a % 5 === 0 && a - desde >= 3 && hasta - a >= 3));
 
   return (
     <div className="linea">
-      <div className="linea-columnas">
+      <div className="linea-columnas" style={columnas}>
         {ANIOS.map((anio) => {
           const lista = porAnio[anio] ?? [];
           const activo = anioActivo === anio;
@@ -32,10 +37,10 @@ export default function LineaDeTiempo({ albums, anioActivo, onElegirAnio }) {
           );
         })}
       </div>
-      <div className="linea-eje" aria-hidden="true">
-        {ANIOS.filter((a) => a % 4 === 0).map((a) => (
-          <span key={a} className={a === ANIO_MAX ? 'eje-fin' : ''} style={{ gridColumn: a - ANIO_MIN + 1 }}>
-            {a === ANIO_MIN || a === ANIO_MAX || a === 2000 ? a : `’${String(a).slice(2)}`}
+      <div className="linea-eje" aria-hidden="true" style={columnas}>
+        {marcas.map((a) => (
+          <span key={a} style={{ gridColumn: a - desde + 1 }}>
+            {a === desde || a === hasta || a === 2000 ? a : `’${String(a).slice(2)}`}
           </span>
         ))}
       </div>

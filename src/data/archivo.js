@@ -310,3 +310,13 @@ export const artistaPorNombre = (nombre) => {
   const n = normalTitulo(nombre);
   return n ? ARTISTAS.find((a) => normalTitulo(a.nombre) === n) : undefined;
 };
+
+// ¿Este disco o canción del cajón es de un disco del archivo? (mismo título y mismo artista)
+export function discoDelArchivo(album) {
+  const titulo = album.type === 'cancion' ? album.album : album.title;
+  const d = albumPorTitulo(titulo);
+  if (!d) return undefined;
+  const a = normalTitulo(autorDe(d));
+  const b = normalTitulo(album.artist);
+  return a && b && (a.includes(b) || b.includes(a)) ? d : undefined;
+}

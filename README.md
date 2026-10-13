@@ -183,5 +183,6 @@ firestore.rules          reglas de seguridad
 - **v13.0** — Escuchar completo en la app de Spotify (control remoto con Spotify Connect, sigue con la pantalla apagada) y "Abrir en la app de Spotify" para todos.
 - **v14.0** — Todos los discos: discografía completa de cada artista y buscador de cualquier disco, con su propia página (canciones, play, agregar al cajón). Los 24 del archivo siguen con ficha verificada (★).
 - **v14.1** — La lista de Álbumes muestra todos los discos de todos los artistas (no solo los 24 del archivo), con filtros por costa, artista y nombre.
+- **v15.0** — Mi cajón rediseñado: tarjetas con tapa real, historia corta de los discos del archivo, agregar buscando en Spotify, línea de tiempo y filtros más simples.
 
 Las imágenes de artistas y tapas vienen de Wikipedia. Si no cargan, se muestra una portada generada con el color de la costa.
