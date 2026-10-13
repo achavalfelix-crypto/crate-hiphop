@@ -1,0 +1,36 @@
+body {
+  font-family: system-ui, sans-serif;
+  margin: 0;
+  padding: 24px;
+}
+.app {
+  max-width: 640px;
+  margin: 0 auto;
+}
+.form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+.form input {
+  flex: 1 1 140px;
+  padding: 8px;
+}
+.lista {
+  list-style: none;
+  padding: 0;
+}
+.lista li {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid #ddd;
+}
+.mensaje.ok {
+  color: green;
+}
+.mensaje.error {
+  color: crimson;
+}
