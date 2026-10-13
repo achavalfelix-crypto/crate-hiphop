@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { ESTADOS, nombreCosta } from '../data/constantes';
 import AlbumForm from './AlbumForm';
 import Canciones from './Canciones';
+import DatosYouTube from './DatosYouTube';
+import { formatoDuracion } from '../services/youtube';
 import Portada from './Portada';
 import Puntaje from './Puntaje';
 
 // Una fila de la lista: puede ser un disco (con sus canciones) o una canción suelta.
-export default function AlbumItem({ album, onActualizar, onEliminar }) {
+export default function AlbumItem({ album, onActualizar, onEliminar, yt = {} }) {
   const [abierto, setAbierto] = useState(false);
   const [editando, setEditando] = useState(false);
   const [confirmando, setConfirmando] = useState(false);
@@ -14,6 +16,8 @@ export default function AlbumItem({ album, onActualizar, onEliminar }) {
   const esCancion = album.type === 'cancion';
   const actualizar = (cambios) => onActualizar(album, cambios);
   const favoritas = album.tracks.filter((t) => t.fav).length;
+  // Duración total de las canciones del disco que tienen video.
+  const totalDisco = album.tracks.reduce((s, t) => s + (yt[t.videoId]?.duracion ?? 0), 0);
 
   if (editando) {
     return (
@@ -47,6 +51,13 @@ export default function AlbumItem({ album, onActualizar, onEliminar }) {
           {esCancion && album.album && (
             <p className="album-de">
               Del disco <em>{album.album}</em>
+            </p>
+          )}
+          {esCancion && <DatosYouTube videoId={album.videoId} datos={yt} />}
+          {!esCancion && totalDisco > 0 && (
+            <p className="yt">
+              <span className="yt-duracion">{formatoDuracion(totalDisco)}</span>
+              <span className="yt-nota">en {album.tracks.filter((t) => yt[t.videoId]).length} canciones</span>
             </p>
           )}
         </div>
@@ -100,7 +111,7 @@ export default function AlbumItem({ album, onActualizar, onEliminar }) {
         </div>
 
         {abierto && !esCancion && (
-          <Canciones tracks={album.tracks} onCambiar={(tracks) => actualizar({ tracks })} />
+          <Canciones tracks={album.tracks} yt={yt} onCambiar={(tracks) => actualizar({ tracks })} />
         )}
       </div>
     </li>

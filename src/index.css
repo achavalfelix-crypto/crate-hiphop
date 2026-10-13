@@ -731,3 +731,60 @@ select {
     flex: 1;
   }
 }
+
+/* ───────── v6: datos de YouTube ───────── */
+.yt {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 12px;
+  margin-top: 4px;
+  font-size: 0.875rem;
+  color: var(--gris);
+  font-variant-numeric: tabular-nums;
+}
+.yt-duracion {
+  font-weight: 600;
+  color: var(--tinta);
+}
+.yt-vistas {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.yt-punto {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--midwest);
+  animation: latido 2s ease-in-out infinite;
+}
+@keyframes latido {
+  50% {
+    opacity: 0.25;
+  }
+}
+.yt-link {
+  color: var(--tinta);
+  font-weight: 600;
+  text-underline-offset: 3px;
+}
+.yt-compacto {
+  margin: 0 4px 0 0;
+  font-size: 0.8125rem;
+  gap: 2px 8px;
+  flex-wrap: nowrap;
+}
+.yt-nota {
+  font-size: 0.8125rem;
+}
+@media (prefers-reduced-motion: reduce) {
+  .yt-punto {
+    animation: none;
+  }
+}
+@media (max-width: 720px) {
+  .yt-compacto .yt-vistas {
+    display: none;
+  }
+}

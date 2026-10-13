@@ -28,6 +28,7 @@ export function normalizar(a) {
     ...a,
     type: a.type ?? 'album',
     album: a.album ?? '',
+    videoId: a.videoId ?? '',
     coast: a.coast ?? 'east',
     status: a.status ?? (a.escuchado ? 'escuchado' : 'pendiente'),
     rating: a.rating ?? 0,

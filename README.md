@@ -14,6 +14,7 @@ Aplicación web para armar tu propio cajón de discos y canciones de rap gangste
 - Búsqueda por disco, canción o artista, y filtros por tipo, costa y estado.
 - Catálogo inicial opcional de 23 discos clave, para no arrancar con el cajón vacío.
 - Importar una lista desde un archivo JSON: valida cada entrada y saltea las que ya están en el cajón.
+- Duración y reproducciones de YouTube en vivo (se actualizan cada minuto) y link para escuchar cada canción, si tiene video asociado.
 - Mensajes de carga, éxito y error en cada operación.
 
 ## Tecnologías
@@ -30,13 +31,14 @@ Cada visitante entra con un usuario anónimo. Sus discos y canciones se guardan 
 users/{uid}/albums/{albumId}
   type: string         // album | cancion
   album: string        // de qué disco es la canción (opcional)
+  videoId: string      // video de YouTube de la canción (opcional)
   title: string        // "Illmatic"
   artist: string       // "Nas"
   year: number         // 1980–2016
   coast: string        // west | east | south | midwest
   status: string       // pendiente | escuchando | escuchado
   rating: number       // 0–5
-  tracks: [{ id, title, fav }]   // canciones del disco (vacío en las canciones sueltas)
+  tracks: [{ id, title, fav, videoId }]   // canciones del disco (vacío en las canciones sueltas)
   createdAt, updatedAt // fecha del servidor
 ```
 
@@ -61,6 +63,14 @@ VITE_FIREBASE_AUTH_DOMAIN=
 VITE_FIREBASE_PROJECT_ID=
 VITE_FIREBASE_APP_ID=
 ```
+
+Opcional, para la duración y las reproducciones de YouTube:
+
+```
+VITE_YOUTUBE_API_KEY=
+```
+
+Es una clave de navegador de Google Cloud con la **YouTube Data API v3** habilitada, restringida a los dominios de la app (Restricciones de sitios web) y solo a esa API. Sin la clave, la app funciona igual pero sin esos datos.
 
 Después de cambiar `.env`, reiniciá `npm run dev`.
 
@@ -107,5 +117,6 @@ firestore.rules          reglas de seguridad
 - **v3.0** — Diseño final, línea de tiempo, búsqueda, catálogo inicial, confirmación al eliminar y versión para celular.
 - **v4.0** — Canciones sueltas además de discos: selector Disco/Canción, filtro por tipo, portada redonda y bloque bajo en la línea de tiempo.
 - **v5.0** — Importar desde un archivo JSON (por ejemplo, una lista armada a partir del historial de YouTube Music), sin duplicar lo que ya está.
+- **v6.0** — Duración y reproducciones en vivo desde la YouTube Data API, link para escuchar y duración total de cada disco.
 
 Las portadas son generadas con tipografía (color de la costa + inicial). No se usan tapas reales.

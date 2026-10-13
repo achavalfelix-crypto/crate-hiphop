@@ -1,7 +1,8 @@
 import { useState } from 'react';
+import DatosYouTube from './DatosYouTube';
 
 // Lista de canciones de un disco. Se guardan dentro del mismo documento, en el campo `tracks`.
-export default function Canciones({ tracks, onCambiar }) {
+export default function Canciones({ tracks, onCambiar, yt = {} }) {
   const [nueva, setNueva] = useState('');
   const [error, setError] = useState('');
 
@@ -29,6 +30,7 @@ export default function Canciones({ tracks, onCambiar }) {
             <li key={t.id} className={t.fav ? 'fav' : ''}>
               <div className="cancion-fila">
               <span className="cancion-titulo">{t.title}</span>
+              <DatosYouTube videoId={t.videoId} datos={yt} compacto />
               <button
                 type="button"
                 className="btn-icono"

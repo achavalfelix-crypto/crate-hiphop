@@ -9,6 +9,7 @@ import LineaDeTiempo from './components/LineaDeTiempo';
 import { CATALOGO } from './data/catalogo';
 import { normalizar } from './data/constantes';
 import { prepararImportacion } from './data/importar';
+import useYouTube from './hooks/useYouTube';
 import { firebaseConfigurado } from './firebase';
 import {
   actualizarAlbum,
@@ -136,6 +137,13 @@ export default function App() {
   const discos = conteoTipos.album ?? 0;
   const canciones = conteoTipos.cancion ?? 0;
   const escuchados = albums.filter((a) => a.status === 'escuchado').length;
+
+  // Videos de YouTube de las canciones sueltas y de las canciones de cada disco.
+  const videoIds = useMemo(
+    () => albums.flatMap((a) => [a.videoId, ...a.tracks.map((t) => t.videoId)]).filter(Boolean),
+    [albums],
+  );
+  const youtube = useYouTube(videoIds);
   const vacio = !cargando && !errorCarga && albums.length === 0;
 
   return (
@@ -245,6 +253,7 @@ export default function App() {
             {!vacio && (
               <AlbumList
                 albums={visibles}
+                yt={youtube.datos}
                 onLimpiarFiltros={() => setFiltros(SIN_FILTROS)}
                 onActualizar={(album, cambios) =>
                   ejecutar(
@@ -268,6 +277,13 @@ export default function App() {
 
       <footer className="pie">
         <p>Tus discos y canciones se guardan en Firebase y solo los ves vos, en este navegador.</p>
+        {youtube.actualizado && (
+          <p>
+            Duración y reproducciones de YouTube, actualizadas a las{' '}
+            {youtube.actualizado.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false })}
+            {' '}(se actualizan cada minuto).
+          </p>
+        )}
       </footer>
 
       <Aviso aviso={aviso} onCerrar={cerrarAviso} />

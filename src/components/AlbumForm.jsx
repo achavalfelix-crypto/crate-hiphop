@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import { ANIO_MAX, ANIO_MIN, COSTAS, TIPOS } from '../data/constantes';
+import { idDeYouTube } from '../services/youtube';
 
-const VACIO = { type: 'album', title: '', artist: '', album: '', year: '', coast: 'west' };
+const VACIO = { type: 'album', title: '', artist: '', album: '', link: '', year: '', coast: 'west' };
 
 // Sirve para agregar un disco o una canción, o editar uno existente (si recibe `inicial`).
 export default function AlbumForm({ inicial, onGuardar, onCancelar, deshabilitado }) {
-  const [form, setForm] = useState(inicial ? { ...inicial, year: String(inicial.year) } : VACIO);
+  const [form, setForm] = useState(
+    inicial ? { ...inicial, year: String(inicial.year), link: inicial.videoId ?? '' } : VACIO,
+  );
   const [errores, setErrores] = useState({});
   const [guardando, setGuardando] = useState(false);
 
@@ -19,6 +22,8 @@ export default function AlbumForm({ inicial, onGuardar, onCancelar, deshabilitad
     if (!form.artist.trim()) e.artist = 'Escribí el artista.';
     if (!Number.isInteger(anio) || anio < ANIO_MIN || anio > ANIO_MAX)
       e.year = `Tiene que ser entre ${ANIO_MIN} y ${ANIO_MAX}.`;
+    if (esCancion && form.link.trim() && !idDeYouTube(form.link))
+      e.link = 'Pegá un link de YouTube o YouTube Music.';
     return e;
   }
 
@@ -33,6 +38,7 @@ export default function AlbumForm({ inicial, onGuardar, onCancelar, deshabilitad
       title: form.title.trim(),
       artist: form.artist.trim(),
       album: esCancion ? form.album.trim() : '',
+      videoId: esCancion ? idDeYouTube(form.link) : '',
       year: Number(form.year),
       coast: form.coast,
     });
@@ -74,6 +80,19 @@ export default function AlbumForm({ inicial, onGuardar, onCancelar, deshabilitad
         <div className="campo">
           <label htmlFor={`${id}-album`}>Del disco (opcional)</label>
           <input id={`${id}-album`} value={form.album} onChange={cambiar('album')} maxLength={120} />
+        </div>
+      )}
+      {esCancion && (
+        <div className="campo">
+          <label htmlFor={`${id}-link`}>Link de YouTube (opcional)</label>
+          <input
+            id={`${id}-link`}
+            value={form.link}
+            onChange={cambiar('link')}
+            placeholder="music.youtube.com/watch?v=…"
+            inputMode="url"
+          />
+          {errores.link && <small className="error">{errores.link}</small>}
         </div>
       )}
       <div className="campo campo-corto">

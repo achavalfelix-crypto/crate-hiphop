@@ -1,3 +1,4 @@
+import { idDeYouTube } from '../services/youtube';
 import { ANIO_MAX, ANIO_MIN, COSTAS, ESTADOS } from './constantes';
 
 // Revisa y limpia una entrada leída de un archivo JSON.
@@ -19,10 +20,27 @@ export function limpiarEntrada(e) {
       ? e.tracks
           .filter((t) => t && typeof t.title === 'string' && t.title.trim())
           .slice(0, 60)
-          .map((t, i) => ({ id: `i${i}`, title: t.title.trim().slice(0, 120), fav: Boolean(t.fav) }))
+          .map((t, i) => ({
+            id: `i${i}`,
+            title: t.title.trim().slice(0, 120),
+            fav: Boolean(t.fav),
+            videoId: idDeYouTube(t.videoId),
+          }))
       : [];
 
-  return { type, title, artist, album: type === 'cancion' ? texto(e.album, 120) : '', year, coast, status, rating, tracks };
+  const esCancion = type === 'cancion';
+  return {
+    type,
+    title,
+    artist,
+    album: esCancion ? texto(e.album, 120) : '',
+    videoId: esCancion ? idDeYouTube(e.videoId) : '',
+    year,
+    coast,
+    status,
+    rating,
+    tracks,
+  };
 }
 
 // Clave para detectar repetidos: mismo tipo, título y artista (sin importar mayúsculas).
