@@ -32,10 +32,18 @@ async function pedirToken() {
   return token.valor;
 }
 
-async function api(ruta) {
+const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
+
+async function api(ruta, intento = 0) {
   const res = await fetch('https://api.spotify.com/v1' + ruta, {
     headers: { Authorization: `Bearer ${await pedirToken()}` },
   });
+  // Si Spotify pide esperar (muchos pedidos juntos), esperamos lo que dice y reintentamos hasta 2 veces.
+  if (res.status === 429 && intento < 2) {
+    const segundos = Math.min(Number(res.headers.get('retry-after')) || 1, 4);
+    await esperar(segundos * 1000 + 200);
+    return api(ruta, intento + 1);
+  }
   if (res.status === 429) throw Object.assign(new Error('Spotify está saturado, probá en un rato'), { estado: 429 });
   if (!res.ok) throw Object.assign(new Error(`Spotify respondió ${res.status}`), { estado: 502 });
   return res.json();
@@ -105,7 +113,7 @@ export async function discografia(nombre) {
   const art = await buscarArtista(nombre);
   if (!art) return null;
   const todos = [];
-  for (let offset = 0; offset < 200; ) {
+  for (let offset = 0; offset < 100; ) {
     let r;
     try {
       r = await api(`/artists/${art.id}/albums?include_groups=album&limit=50&offset=${offset}`);

@@ -12,9 +12,21 @@ export default function useTodosLosDiscos() {
     let vivo = true;
     (async () => {
       let fallos = 0;
-      for (let i = 0; i < ARTISTAS.length; i += 4) {
-        const lote = ARTISTAS.slice(i, i + 4);
-        const res = await Promise.all(lote.map((a) => discografiaSpotify(a.nombre).catch(() => (fallos++, null))));
+      // Si un artista falla (Spotify frena cuando hay muchos pedidos juntos), se reintenta hasta 3 veces esperando un poco más cada vez.
+      const traer = async (a) => {
+        for (let intento = 0; intento < 4; intento++) {
+          try {
+            return await discografiaSpotify(a.nombre);
+          } catch {
+            await new Promise((r) => setTimeout(r, 1500 * (intento + 1)));
+          }
+        }
+        fallos++;
+        return null;
+      };
+      for (let i = 0; i < ARTISTAS.length; i += 3) {
+        const lote = ARTISTAS.slice(i, i + 3);
+        const res = await Promise.all(lote.map(traer));
         if (!vivo) return;
         setPorArtista((prev) => {
           const sig = { ...prev };
