@@ -1708,8 +1708,8 @@ body::after {
   position: absolute;
   inset: 0;
   background: var(--c, var(--oro));
-  mix-blend-mode: color;
-  opacity: 0.85;
+  mix-blend-mode: soft-light;
+  opacity: 0.35;
   transition: opacity 0.4s;
   pointer-events: none;
 }
