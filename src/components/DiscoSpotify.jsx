@@ -4,6 +4,7 @@ import { link } from '../hooks/useRuta';
 import { agregarAlbum, iniciarSesion } from '../services/albums';
 import { reproducir, useReproductor } from '../services/reproductor';
 import { albumSpotify, minutos } from '../services/spotify';
+import { sumarAlCajonDeSpotify } from '../services/spotifyCuenta';
 
 // Botón chico para guardar una canción en Mi cajón.
 function GuardarCancion({ cancion, disco, autor }) {
@@ -17,6 +18,7 @@ function GuardarCancion({ cancion, disco, autor }) {
         year: disco.anio, coast: disco.costa, status: 'pendiente', rating: 0, tracks: [],
       });
       setEstado('ok');
+      sumarAlCajonDeSpotify(cancion.id).catch(() => {}); // si tiene Spotify conectado, también va allá
     } catch {
       setEstado('error');
     }

@@ -2545,3 +2545,57 @@ body.con-reproductor:has(.reproductor-cola) {
     grid-template-columns: 1fr;
   }
 }
+
+/* ── Conectar Spotify ── */
+.btn-spotify {
+  background: #1ed760;
+  border-color: #1ed760;
+  color: #0b0b0b;
+}
+.btn-spotify:hover {
+  background: #3be477;
+}
+.conexion-spotify {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  margin: 0 0 28px;
+  padding: 14px 16px;
+  border: 1px solid var(--linea);
+  border-left: 6px solid #1ed760;
+  border-radius: 6px;
+  background: var(--papel);
+}
+.conexion-spotify p {
+  flex: 1;
+  min-width: min(100%, 260px);
+  font-size: 0.9375rem;
+}
+.conexion-spotify .error {
+  flex-basis: 100%;
+}
+.cs-punto {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #1ed760;
+  box-shadow: 0 0 0 4px rgba(30, 215, 96, 0.2);
+}
+.aviso-spotify {
+  max-width: 1040px;
+  margin: 12px auto 0;
+  padding: 12px 16px;
+  border-left: 6px solid #1ed760;
+  background: var(--papel);
+}
+.aviso-ok {
+  background: #1ed760;
+}
+.aviso-ok,
+.aviso-ok a {
+  color: #0b0b0b;
+}
+.playlist-cabeza .conexion-spotify {
+  margin: 4px 0 0;
+}

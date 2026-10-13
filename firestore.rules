@@ -35,7 +35,8 @@ service cloud.firestore {
         return request.auth != null && request.auth.uid == userId;
       }
       function playlistValida(d) {
-        return d.keys().hasOnly(['nombre', 'descripcion', 'canciones', 'createdAt', 'updatedAt'])
+        return d.keys().hasOnly(['nombre', 'descripcion', 'canciones', 'spotifyPlaylistId', 'createdAt', 'updatedAt'])
+          && (!('spotifyPlaylistId' in d) || (d.spotifyPlaylistId is string && d.spotifyPlaylistId.size() <= 40))
           && d.nombre is string && d.nombre.size() > 0 && d.nombre.size() <= 60
           && (!('descripcion' in d) || (d.descripcion is string && d.descripcion.size() <= 200))
           && d.canciones is list && d.canciones.size() <= 100;

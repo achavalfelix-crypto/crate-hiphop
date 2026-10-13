@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import ConexionSpotify from '../components/ConexionSpotify';
 import { Migas } from '../components/Nav';
 import DiscosDeLaLista from '../components/playlists/DiscosDeLaLista';
 import ListaCanciones from '../components/playlists/ListaCanciones';
@@ -9,6 +10,7 @@ import useCancionesCajon from '../hooks/useCancionesCajon';
 import { link } from '../hooks/useRuta';
 import { actualizarPlaylist, crearPlaylist, eliminarPlaylist, MAX_CANCIONES } from '../services/playlists';
 import { reproducirCola } from '../services/reproductor';
+import { guardarEnSpotify, useCuentaSpotify } from '../services/spotifyCuenta';
 
 // Buscador para sumar canciones del cajón a la playlist.
 function AgregarCanciones({ disponibles, onAgregar, lleno }) {
@@ -58,6 +60,9 @@ export default function Playlist({ id }) {
   const [aviso, setAviso] = useState('');
   const [combinarCon, setCombinarCon] = useState('');
   const [confirmando, setConfirmando] = useState(false);
+  const [subiendo, setSubiendo] = useState(false);
+  const [enSpotify, setEnSpotify] = useState(null); // { url, faltaron }
+  const cuenta = useCuentaSpotify();
   const p = playlists.find((x) => x.id === id);
 
   const disponibles = useMemo(() => {
@@ -125,6 +130,20 @@ export default function Playlist({ id }) {
     }
   }
 
+  async function subirASpotify() {
+    setSubiendo(true);
+    setAviso('');
+    try {
+      const r = await guardarEnSpotify(p);
+      if (r.id !== p.spotifyPlaylistId) await actualizarPlaylist(uid, p.id, { spotifyPlaylistId: r.id });
+      setEnSpotify(r);
+    } catch (e) {
+      setAviso(e.message);
+    } finally {
+      setSubiendo(false);
+    }
+  }
+
   const otras = playlists.filter((x) => x.id !== p.id && x.canciones.length);
   const minutos = lista.length ? `${lista.length} ${lista.length === 1 ? 'canción' : 'canciones'}` : 'Vacía';
 
@@ -167,7 +186,22 @@ export default function Playlist({ id }) {
           <button type="button" className="btn" disabled={lista.length < 2} onClick={() => reproducirCola(p.nombre, mezclar(lista, Date.now() % 9973))}>
             Escuchar mezclada
           </button>
+          {cuenta && (
+            <button type="button" className="btn btn-spotify" disabled={!lista.length || subiendo} onClick={subirASpotify}>
+              {subiendo ? 'Guardando en Spotify…' : p.spotifyPlaylistId ? 'Actualizar en mi Spotify' : 'Guardar en mi Spotify'}
+            </button>
+          )}
         </div>
+        {enSpotify && (
+          <p className="aviso-linea aviso-ok" role="status">
+            Listo, está en tu Spotify.{' '}
+            <a href={enSpotify.url} target="_blank" rel="noreferrer">
+              Abrirla en Spotify
+            </a>
+            {enSpotify.faltaron > 0 && ` (${enSpotify.faltaron} ${enSpotify.faltaron === 1 ? 'tema no está' : 'temas no están'} en Spotify)`}
+          </p>
+        )}
+        {!cuenta && <ConexionSpotify />}
       </header>
 
       {aviso && <p className="aviso-linea" role="status">{aviso}</p>}

@@ -104,6 +104,15 @@ La página usa Spotify sin pedirle a nadie que inicie sesión, así la puede usa
 1. En [developer.spotify.com/dashboard](https://developer.spotify.com/dashboard) creá una app con la Web API (la cuenta dueña necesita Premium).
 2. Copiá el Client ID y el Client Secret a Vercel (Settings → Environment Variables) como `SPOTIFY_CLIENT_ID` y `SPOTIFY_CLIENT_SECRET`, y también a tu `.env` para probar en local.
 
+### Conectar Spotify (demo, hasta 5 cuentas)
+
+En Mi cajón → Playlists, el botón **Conectar Spotify** usa el inicio de sesión oficial para páginas web (Authorization Code con PKCE): no hay secreto en el navegador y el permiso queda guardado en ese navegador. Con la cuenta conectada:
+
+- cada playlist tiene **Guardar en mi Spotify** (y después **Actualizar en mi Spotify**);
+- cada canción que se guarda con **+** desde un disco también se suma a la playlist "Mi cajón · The Golden Era Archives" en el Spotify de la persona.
+
+Mientras la app esté en modo desarrollador, Spotify solo deja usarlo a las cuentas anotadas en el panel (Settings → User Management, máximo 5). En el panel, en **Redirect URIs**, tienen que estar las direcciones exactas del sitio con barra final (por ejemplo `https://the-golden-era-archives.vercel.app/`); para probar en local, `http://127.0.0.1:5173/` (Spotify no acepta `localhost`).
+
 Sin cuenta de Spotify, el reproductor pasa fragmentos; con la cuenta abierta en el navegador, los temas completos.
 
 Las playlists se guardan en `users/{uid}/playlists/{playlistId}` con `nombre`, `descripcion` y `canciones` (hasta 100; cada una con título, artista, disco, año, costa, spotifyId y videoId).
@@ -164,5 +173,6 @@ firestore.rules          reglas de seguridad
 - **v9.0** — Fondo de noche con grano y una luz que toma el color de la costa; fichas que se levantan, foto que se enciende al pasar el mouse, toda la ficha se puede tocar, transición animada de la lista a la ficha y un vinilo que sale de la funda y gira cuando suena un tema.
 - **v10.0** — Reproductor propio de la página (Spotify y YouTube, sin salir del sitio), play en cada canción del cajón con búsqueda automática, favoritas con filtro, discos que se guardan con todas sus canciones y app instalable en el celular.
 - **v11.0** — Playlists: sugerencias, armado a mano, combinar, separar, cola de reproducción con anterior/siguiente y cada tema llevando a su disco. Ver HOJA-DE-RUTA.md para lo que sigue.
+- **v12.0** — Conectar Spotify (demo): guardar y actualizar playlists en la cuenta de Spotify de la persona y sumar a "Mi cajón" en Spotify cada canción que se guarda.
 
 Las imágenes de artistas y tapas vienen de Wikipedia. Si no cargan, se muestra una portada generada con el color de la costa.

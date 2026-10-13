@@ -5,6 +5,7 @@
 //
 //   /api/spotify?tipo=album&titulo=Illmatic&artista=Nas
 //   /api/spotify?tipo=artista&nombre=Nas
+//   /api/spotify?tipo=config   → Client ID para conectar la cuenta (es público)
 //   /api/spotify?tipo=cancion&titulo=N.Y. State of Mind&artista=Nas
 
 let token = null; // { valor, vence }
@@ -111,6 +112,13 @@ export async function buscarArtista(nombre) {
 
 export default async function handler(req, res) {
   const { tipo, titulo, artista, anio, nombre } = req.query ?? {};
+  // El Client ID es público (no es secreto): el navegador lo usa para "Conectar Spotify".
+  if (tipo === 'config') {
+    const clientId = process.env.SPOTIFY_CLIENT_ID;
+    if (!clientId) return res.status(503).json({ error: 'Spotify no está configurado' });
+    res.setHeader('Cache-Control', 'public, s-maxage=3600');
+    return res.status(200).json({ clientId });
+  }
   try {
     let datos = null;
     if (tipo === 'album' && titulo && artista) datos = await buscarAlbum(String(titulo), String(artista), anio);

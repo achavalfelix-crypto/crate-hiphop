@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import ConexionSpotify from '../components/ConexionSpotify';
 import { Migas } from '../components/Nav';
 import ListaCanciones from '../components/playlists/ListaCanciones';
 import TabsCajon from '../components/playlists/TabsCajon';
@@ -65,6 +66,7 @@ export default function Playlists() {
         <p>Armá tus playlists con lo que tenés en el cajón, o arrancá con las que te proponemos. Cada tema te lleva a su disco.</p>
       </header>
       <TabsCajon activa="playlists" />
+      <ConexionSpotify />
 
       {aviso && <p className="error" role="alert">{aviso}</p>}
       {cargando ? (

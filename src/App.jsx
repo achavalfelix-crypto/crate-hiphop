@@ -1,7 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Nav, { NOMBRE } from './components/Nav';
 import Instalar from './components/Instalar';
 import Reproductor from './components/Reproductor';
+import { completarConexion } from './services/spotifyCuenta';
 import useRuta from './hooks/useRuta';
 import Album from './pages/Album';
 import Albumes from './pages/Albumes';
@@ -17,6 +18,12 @@ const TITULOS = { artistas: 'Artistas', albumes: 'Álbumes', historia: 'Historia
 
 export default function App() {
   const [seccion = '', id, sub] = useRuta();
+  const [avisoSpotify, setAvisoSpotify] = useState('');
+
+  // Si venimos de aceptar en Spotify (la URL trae ?code=…), termina la conexión.
+  useEffect(() => {
+    completarConexion().then(setAvisoSpotify);
+  }, []);
 
   useEffect(() => {
     document.title = TITULOS[seccion] ? `${TITULOS[seccion]} · ${NOMBRE}` : NOMBRE;
@@ -36,6 +43,14 @@ export default function App() {
         Saltar al contenido
       </a>
       <Nav seccion={TITULOS[seccion] ? seccion : ''} />
+      {avisoSpotify && (
+        <p className="aviso-spotify" role="alert">
+          {avisoSpotify}{' '}
+          <button type="button" className="btn-texto" onClick={() => setAvisoSpotify('')}>
+            Cerrar
+          </button>
+        </p>
+      )}
       <main id="contenido" tabIndex={-1}>
         {pagina}
       </main>
