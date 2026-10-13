@@ -1616,9 +1616,7 @@ main:focus {
   color: var(--hueso);
 }
 .nav {
-  background: rgba(14, 13, 12, 0.82);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: var(--negro);
   border-bottom: 1px solid var(--linea);
 }
 .pie-global {
