@@ -5,6 +5,7 @@ import { Cita, Dato } from '../components/Recuadros';
 import { albumesDe, artistaPorId } from '../data/archivo';
 import { nombreCosta } from '../data/constantes';
 import useWiki from '../hooks/useWiki';
+import { transicion } from '../hooks/foco';
 import { link } from '../hooks/useRuta';
 
 export default function Artista({ id }) {
@@ -23,8 +24,8 @@ export default function Artista({ id }) {
   return (
     <div className="pagina">
       <Migas pasos={[{ nombre: 'Inicio', href: link() }, { nombre: 'Artistas', href: link('artistas') }, { nombre: a.nombre }]} />
-      <article className="detalle">
-        <div className="detalle-imagen">
+      <article className={`detalle costa-${a.costa}`}>
+        <div className="detalle-imagen" style={transicion('art', a.id)}>
           <ImagenWiki wiki={a.wiki} alt={`Foto de ${a.nombre}`} grande respaldo={{ title: a.nombre, coast: a.costa, year: '' }} />
         </div>
         <div className="detalle-cuerpo">

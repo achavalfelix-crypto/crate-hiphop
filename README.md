@@ -150,5 +150,6 @@ firestore.rules          reglas de seguridad
 - **v6.0** — Duración y reproducciones en vivo desde la YouTube Data API, link para escuchar y duración total de cada disco.
 - **v7.0** — Nuevo nombre, The Golden Era Archives. Pasa de cajón personal a archivo: inicio con collage y recorrido, artistas, álbumes e historia con datos verificados, imágenes de Wikipedia y la sección actual siempre marcada.
 - **v8.0** — Spotify: lista completa de canciones y reproductor en cada disco y artista, guardar temas en Mi cajón con un toque, y logo en tipografía de graffiti.
+- **v9.0** — Fondo de noche con grano y una luz que toma el color de la costa; fichas que se levantan, foto que se enciende al pasar el mouse, toda la ficha se puede tocar, transición animada de la lista a la ficha y un vinilo que sale de la funda y gira cuando suena un tema.
 
 Las imágenes de artistas y tapas vienen de Wikipedia. Si no cargan, se muestra una portada generada con el color de la costa.

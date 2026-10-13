@@ -36,7 +36,7 @@ function GuardarCancion({ cancion, disco, autor }) {
 }
 
 // Reproductor y lista completa de canciones de un disco, desde Spotify.
-export default function DiscoSpotify({ disco, autor }) {
+export default function DiscoSpotify({ disco, autor, onSonando }) {
   const clave = `${disco.titulo}|${autor}`;
   const { estado, datos } = useSpotify(() => albumSpotify(disco.titulo, autor, disco.anio), clave);
   const [sonando, setSonando] = useState(null); // id de canción elegida, o null = disco entero
@@ -75,7 +75,11 @@ export default function DiscoSpotify({ disco, autor }) {
             <button
               type="button"
               className="pista-play"
-              onClick={() => setSonando(sonando === c.id ? null : c.id)}
+              onClick={() => {
+                const nuevo = sonando === c.id ? null : c.id;
+                setSonando(nuevo);
+                onSonando?.(Boolean(nuevo));
+              }}
               aria-pressed={sonando === c.id}
               aria-label={sonando === c.id ? `Volver al disco entero` : `Escuchar ${c.nombre}`}
             >

@@ -6,13 +6,14 @@ import SelectorCosta from '../components/SelectorCosta';
 import { ARTISTAS } from '../data/archivo';
 import { nombreCosta } from '../data/constantes';
 import useWiki from '../hooks/useWiki';
+import { seguirMouse, transicion } from '../hooks/foco';
 import { link } from '../hooks/useRuta';
 
 function FichaArtista({ a }) {
   const { estado, datos } = useWiki(a.wiki);
   return (
-    <article className="ficha">
-      <a className="ficha-imagen" href={link('artistas', a.id)} tabIndex={-1} aria-hidden="true">
+    <article className={`ficha costa-${a.costa}`} onPointerMove={seguirMouse}>
+      <a className="ficha-imagen" href={link('artistas', a.id)} tabIndex={-1} aria-hidden="true" style={transicion('art', a.id)}>
         <ImagenWiki wiki={a.wiki} alt="" respaldo={{ title: a.nombre, coast: a.costa, year: '' }} />
       </a>
       <div className="ficha-cuerpo">

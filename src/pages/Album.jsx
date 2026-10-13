@@ -6,6 +6,7 @@ import { Dato } from '../components/Recuadros';
 import { ALBUMES, albumPorId, autorDe } from '../data/archivo';
 import { nombreCosta } from '../data/constantes';
 import useWiki from '../hooks/useWiki';
+import { transicion } from '../hooks/foco';
 import { link } from '../hooks/useRuta';
 import { agregarAlbum, iniciarSesion } from '../services/albums';
 
@@ -45,6 +46,7 @@ function AgregarAlCajon({ d }) {
 export default function Album({ id }) {
   const d = albumPorId(id);
   const { estado, datos } = useWiki(d?.wiki);
+  const [girando, setGirando] = useState(false);
 
   if (!d) {
     return (
@@ -59,9 +61,15 @@ export default function Album({ id }) {
   return (
     <div className="pagina">
       <Migas pasos={[{ nombre: 'Inicio', href: link() }, { nombre: 'Álbumes', href: link('albumes') }, { nombre: d.titulo }]} />
-      <article className="detalle">
+      <article className={`detalle costa-${d.costa}`}>
         <div className="detalle-imagen">
-          <ImagenWiki wiki={d.wiki} alt={`Tapa de ${d.titulo}`} grande respaldo={{ title: d.titulo, coast: d.costa, year: d.anio }} />
+          <div className="funda">
+            <span className={`vinilo ${girando ? 'girando' : ''}`} aria-hidden="true" />
+            <div className="tapa" style={transicion('alb', d.id)}>
+              <ImagenWiki wiki={d.wiki} alt={`Tapa de ${d.titulo}`} grande respaldo={{ title: d.titulo, coast: d.costa, year: d.anio }} />
+            </div>
+            <p className="funda-ayuda">{girando ? 'Sonando…' : 'Tocá un tema de la lista y el disco gira.'}</p>
+          </div>
         </div>
         <div className="detalle-cuerpo">
           <h1 className="titulo-seccion">{d.titulo}</h1>
@@ -82,7 +90,7 @@ export default function Album({ id }) {
 
           <section aria-labelledby="t-escuchar">
             <h2 id="t-escuchar">Escuchalo entero</h2>
-            <DiscoSpotify disco={d} autor={autorDe(d)} />
+            <DiscoSpotify disco={d} autor={autorDe(d)} onSonando={setGirando} />
           </section>
 
           <section aria-labelledby="t-resena">

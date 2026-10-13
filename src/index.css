@@ -1,23 +1,26 @@
 /* ───────── Tokens ───────── */
 :root {
-  --hormigon: #d6d3cc; /* fondo: pared de concreto */
-  --papel: #f2f0eb; /* superficies: campos y paneles */
-  --tinta: #161514; /* texto y bordes */
-  --gris: #57534d; /* texto secundario */
-  --linea: rgba(22, 21, 20, 0.22);
-  --peligro: #a61b12;
-  --ok: #1f5c2e;
+  /* v9: noche. Asfalto con grano en lugar de concreto claro. */
+  --negro: #0e0d0c; /* siempre oscuro: barra, hero, pie */
+  --hueso: #f1ebe0; /* siempre claro: texto sobre oscuro */
+  --hormigon: #121110; /* fondo */
+  --papel: #1d1b19; /* superficies: fichas, paneles, campos */
+  --tinta: #f1ebe0; /* texto y bordes */
+  --gris: #a8a095; /* texto secundario */
+  --linea: rgba(241, 235, 224, 0.18);
+  --peligro: #ff7a6e;
+  --ok: #7fd394;
 
   /* Colores de costa: son información (leyenda, línea de tiempo, portadas) */
-  --west: #2647c9; /* azul lowrider */
-  --east: #8f5e17; /* ocre de botín de trabajo */
-  --south: #63388f; /* violeta */
-  --midwest: #b3261e; /* rojo */
+  --west: #4d6fff; /* azul lowrider */
+  --east: #c08a3e; /* ocre de botín de trabajo */
+  --south: #9a62d6; /* violeta */
+  --midwest: #e04a3f; /* rojo */
 
   --gotica: 'Grenze Gotisch', 'Times New Roman', serif;
   --texto: 'Archivo Variable', 'Arial Narrow', system-ui, sans-serif;
 
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 .costa-west { --c: var(--west); }
@@ -49,7 +52,7 @@ select {
   color: inherit;
 }
 :focus-visible {
-  outline: 3px solid var(--west);
+  outline: 3px solid var(--oro);
   outline-offset: 2px;
 }
 h1,
@@ -127,7 +130,7 @@ p {
 }
 .linea-anio:not(:disabled):hover,
 .linea-anio.activo {
-  background: rgba(22, 21, 20, 0.1);
+  background: rgba(241, 235, 224, 0.1);
 }
 .linea-anio.activo {
   box-shadow: inset 0 -4px 0 var(--tinta);
@@ -286,7 +289,7 @@ select {
   white-space: nowrap;
 }
 .btn:hover {
-  background: rgba(22, 21, 20, 0.08);
+  background: rgba(241, 235, 224, 0.08);
 }
 .btn-primario {
   background: var(--tinta);
@@ -354,7 +357,7 @@ select {
 }
 .campo input,
 .campo select {
-  background: #fff;
+  background: var(--papel);
 }
 .acciones-form {
   display: flex;
@@ -474,7 +477,7 @@ select {
   border: 0;
   background: none;
   font-size: 1.25rem;
-  color: rgba(22, 21, 20, 0.25);
+  color: rgba(241, 235, 224, 0.25);
   cursor: pointer;
 }
 .estrella.llena {
@@ -517,7 +520,7 @@ select {
   gap: 8px;
 }
 .form-cancion input {
-  background: #fff;
+  background: var(--papel);
 }
 
 /* ───────── Estados ───────── */
@@ -925,7 +928,7 @@ main:focus {
   position: absolute;
   inset: auto 0 0 0;
   padding: 120px 24px 40px;
-  background: linear-gradient(transparent, rgba(22, 21, 20, 0.92) 55%);
+  background: linear-gradient(transparent, rgba(14, 13, 12, 0.92) 55%);
   color: var(--papel);
 }
 .hero-texto > * {
@@ -1128,7 +1131,7 @@ main:focus {
   margin-left: auto;
 }
 .selector-costa button:hover {
-  background: rgba(22, 21, 20, 0.08);
+  background: rgba(241, 235, 224, 0.08);
 }
 .selector-costa button.activo {
   background: var(--oro);
@@ -1203,7 +1206,7 @@ main:focus {
   margin: 0;
   padding: 14px 16px;
   border: 1.5px solid var(--tinta);
-  background: #fff;
+  background: var(--papel);
 }
 .recuadro-titulo {
   font-weight: 700;
@@ -1529,7 +1532,7 @@ main:focus {
 .pista {
   display: flex;
   align-items: center;
-  border-bottom: 1px solid rgba(20, 18, 16, 0.18);
+  border-bottom: 1px solid rgba(241, 235, 224, 0.18);
 }
 .pista-play {
   flex: 1;
@@ -1547,7 +1550,7 @@ main:focus {
   min-height: 44px;
 }
 .pista-play:hover {
-  background: rgba(20, 18, 16, 0.06);
+  background: rgba(241, 235, 224, 0.06);
 }
 .pista.sonando {
   background: var(--oro);
@@ -1570,7 +1573,7 @@ main:focus {
   font-size: 0.65rem;
   line-height: 1.4;
   vertical-align: 2px;
-  background: rgba(20, 18, 16, 0.55);
+  background: rgba(241, 235, 224, 0.55);
   color: var(--papel);
   border-radius: 2px;
   text-decoration: none;
@@ -1600,5 +1603,278 @@ main:focus {
   font-weight: 600;
 }
 .pista-guardar:hover {
-  background: rgba(20, 18, 16, 0.08);
+  background: rgba(241, 235, 224, 0.08);
+}
+
+/* ═════════ v9: fondo de noche + entradas interactivas ═════════ */
+
+/* Lo que siempre va oscuro con letra clara */
+.nav,
+.portada-hero,
+.pie-global {
+  background: var(--negro);
+  color: var(--hueso);
+}
+.nav {
+  background: rgba(14, 13, 12, 0.82);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--linea);
+}
+.pie-global {
+  border-top: 1px solid var(--linea);
+}
+.nav-logo,
+.nav-links a,
+.hero-texto,
+.portada {
+  color: var(--hueso);
+}
+/* Sobre dorado, siempre letra oscura */
+.nav-links a.activa,
+.puertas a:hover,
+.puertas a:hover *,
+.selector-costa button.activo,
+.selector-costa button.activo *,
+.aviso-linea,
+.aviso-linea a,
+.pista.sonando,
+.pista.sonando * {
+  color: var(--negro);
+}
+.aviso {
+  background: var(--hueso);
+  color: var(--negro);
+}
+.spotify-reproductor {
+  background: var(--negro);
+}
+
+/* Fondo: asfalto de noche, una luz dorada arriba y otra del color de la costa.
+   En las fichas de detalle, la luz de abajo toma la costa del artista o disco. */
+body {
+  --luz: var(--west);
+  background-color: var(--hormigon);
+  background-image:
+    radial-gradient(1100px 620px at 88% -8%, rgba(217, 166, 46, 0.16), transparent 62%),
+    radial-gradient(900px 560px at -8% 108%, color-mix(in srgb, var(--luz) 26%, transparent), transparent 64%);
+  background-attachment: fixed;
+  transition: --luz 0.6s;
+}
+body:has(.detalle.costa-west) { --luz: var(--west); }
+body:has(.detalle.costa-east) { --luz: var(--east); }
+body:has(.detalle.costa-south) { --luz: var(--south); }
+body:has(.detalle.costa-midwest) { --luz: var(--midwest); }
+/* Grano de película por encima de todo (no bloquea clics) */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0.07;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+}
+
+/* ── Fichas: se levantan, la luz sigue al mouse y la foto se enciende ── */
+.ficha {
+  position: relative;
+  border: 1px solid var(--linea);
+  border-radius: 6px;
+  background:
+    radial-gradient(420px circle at var(--mx, -500px) var(--my, -500px), color-mix(in srgb, var(--c, var(--oro)) 22%, transparent), transparent 60%),
+    var(--papel);
+  transition: transform 0.25s ease, border-color 0.25s, box-shadow 0.25s;
+}
+.ficha:hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--c, var(--oro)) 70%, transparent);
+  box-shadow: 0 18px 40px -18px color-mix(in srgb, var(--c, var(--oro)) 60%, transparent);
+}
+.ficha-imagen {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: 4px;
+  align-self: start;
+}
+.ficha-imagen .imagen-wiki {
+  filter: grayscale(1) contrast(1.1);
+  transition: filter 0.4s, transform 0.5s;
+}
+/* Tinte del color de la costa que se va al pasar el mouse */
+.ficha-imagen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--c, var(--oro));
+  mix-blend-mode: color;
+  opacity: 0.85;
+  transition: opacity 0.4s;
+  pointer-events: none;
+}
+.ficha:hover .ficha-imagen .imagen-wiki,
+.ficha:focus-within .ficha-imagen .imagen-wiki {
+  filter: none;
+  transform: scale(1.06);
+}
+.ficha:hover .ficha-imagen::after,
+.ficha:focus-within .ficha-imagen::after {
+  opacity: 0;
+}
+.ficha-mas {
+  text-decoration: none;
+}
+.ficha-mas::after {
+  content: ' →';
+  display: inline-block;
+  transition: transform 0.2s;
+}
+.ficha:hover .ficha-mas::after {
+  transform: translateX(6px);
+}
+/* Toda la ficha se puede tocar: el link "Ver ficha completa" la cubre */
+.ficha-mas::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+.ficha a:not(.ficha-mas),
+.ficha button {
+  position: relative;
+  z-index: 2;
+}
+.recuadro {
+  border: 1px solid var(--linea);
+  border-radius: 4px;
+  background: rgba(14, 13, 12, 0.45);
+}
+.recuadro-dato {
+  border-left: 6px solid var(--oro);
+}
+
+/* ── Detalle: entra escalonado ── */
+@keyframes subir {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: none; }
+}
+.detalle-cuerpo > * {
+  animation: subir 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.detalle-cuerpo > :nth-child(2) { animation-delay: 0.06s; }
+.detalle-cuerpo > :nth-child(3) { animation-delay: 0.12s; }
+.detalle-cuerpo > :nth-child(4) { animation-delay: 0.18s; }
+.detalle-cuerpo > :nth-child(n + 5) { animation-delay: 0.24s; }
+.detalle-imagen {
+  position: sticky;
+  top: 80px;
+  align-self: start;
+}
+.detalle-imagen .imagen-wiki {
+  border: 0;
+  border-radius: 4px;
+  box-shadow: 0 30px 60px -20px color-mix(in srgb, var(--c, var(--oro)) 55%, rgba(0, 0, 0, 0.6));
+}
+
+/* ── El disco sale de la funda ── */
+.funda {
+  position: relative;
+  isolation: isolate;
+  padding-bottom: 60%;
+}
+.funda .tapa {
+  position: relative;
+  z-index: 1;
+}
+.vinilo {
+  position: absolute;
+  z-index: 0;
+  left: 6%;
+  right: 6%;
+  top: 4%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, var(--c, var(--oro)) 0 15%, #0b0a09 15.5% 17%, transparent 17.5%),
+    repeating-radial-gradient(circle, #1b1a19 0 1.5px, #34312e 2px 3px),
+    #1b1a19;
+  box-shadow: 0 24px 50px -12px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(241, 235, 224, 0.16);
+  translate: 0 56%;
+  animation: sacar 0.9s 0.25s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+/* Reflejo de luz que gira con el disco */
+.vinilo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(from 30deg, transparent 0 8%, rgba(255, 255, 255, 0.18) 12%, transparent 18% 58%, rgba(255, 255, 255, 0.14) 62%, transparent 68%);
+}
+.vinilo.girando {
+  animation: sacar 0.9s 0.25s cubic-bezier(0.2, 0.7, 0.2, 1) both, girar 1.8s linear infinite;
+}
+@keyframes sacar {
+  from { translate: 0 0; }
+  to { translate: 0 56%; }
+}
+@keyframes girar {
+  from { rotate: 0deg; }
+  to { rotate: 360deg; }
+}
+.funda-ayuda {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 0.8125rem;
+  color: var(--gris);
+}
+
+/* ── Grilla "más del artista": se levanta ── */
+.grilla-discos a .imagen-wiki {
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+.grilla-discos a:hover .imagen-wiki {
+  transform: translateY(-6px) rotate(-1.5deg);
+  box-shadow: 0 16px 30px -12px rgba(0, 0, 0, 0.8);
+}
+
+/* ── Transición entre lista y ficha (navegadores que la soportan) ── */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.35s;
+}
+::view-transition-group(*) {
+  animation-duration: 0.45s;
+  animation-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+@media (max-width: 720px) {
+  .detalle-imagen {
+    position: static;
+  }
+  .funda {
+    max-width: 320px;
+    margin: 0 auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ficha,
+  .ficha-imagen .imagen-wiki,
+  .detalle-cuerpo > *,
+  .vinilo,
+  .vinilo.girando,
+  .grilla-discos a .imagen-wiki {
+    animation: none !important;
+    transition: none !important;
+  }
+  .vinilo {
+    translate: 0 56%;
+  }
+  .ficha:hover {
+    transform: none;
+  }
 }

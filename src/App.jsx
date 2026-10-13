@@ -19,8 +19,8 @@ export default function App() {
   }, [seccion]);
 
   let pagina;
-  if (seccion === 'artistas') pagina = id ? <Artista id={id} /> : <Artistas />;
-  else if (seccion === 'albumes') pagina = id ? <Album id={id} /> : <Albumes />;
+  if (seccion === 'artistas') pagina = id ? <Artista key={id} id={id} /> : <Artistas />;
+  else if (seccion === 'albumes') pagina = id ? <Album key={id} id={id} /> : <Albumes />;
   else if (seccion === 'historia') pagina = <Historia />;
   else if (seccion === 'cajon') pagina = <Cajon />;
   else pagina = <Inicio />;
