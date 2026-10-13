@@ -2612,3 +2612,53 @@ body.con-reproductor:has(.reproductor-cola) {
   background: var(--negro);
   pointer-events: none;
 }
+
+/* ── v13: escuchar completo en la app de Spotify ── */
+.donde-suena {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 16px;
+  margin-top: 6px;
+  font-size: 0.875rem;
+}
+.donde-suena .btn {
+  padding: 6px 12px;
+  font-size: 0.875rem;
+}
+.donde-suena a.btn-texto {
+  color: var(--hueso);
+}
+.control-remoto {
+  display: grid;
+  gap: 8px;
+  padding: 10px 4px;
+}
+.control-remoto p {
+  font-size: 0.9375rem;
+}
+.cr-botones {
+  display: flex;
+  gap: 8px;
+}
+.cr-botones button {
+  width: 52px;
+  height: 44px;
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--hueso);
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+.cr-botones button:hover {
+  border-color: #1ed760;
+}
+body.con-reproductor:has(.donde-suena) {
+  padding-bottom: calc(150px + env(safe-area-inset-bottom));
+}
+.control-remoto .cs-punto {
+  display: inline-block;
+  vertical-align: 1px;
+  margin-right: 6px;
+}

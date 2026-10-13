@@ -50,7 +50,7 @@ export default function DiscoSpotify({ disco, autor }) {
 
   const total = datos.canciones.reduce((s, c) => s + c.duracion, 0);
   const variosDiscos = datos.canciones.some((c) => c.disco > 1);
-  const sonandoId = pista?.fuente === 'spotify' ? pista.id : null;
+  const sonandoId = pista?.fuente === 'spotify' || pista?.fuente === 'app' ? pista.id : null;
   const discoEntero = sonandoId === datos.id;
 
   return (

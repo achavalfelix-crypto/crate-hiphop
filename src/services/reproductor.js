@@ -10,6 +10,7 @@
 // }
 import { useSyncExternalStore } from 'react';
 import { cancionSpotify } from './spotify';
+import { enModoApp, linkApp, SinDispositivo, sonarEnApp } from './spotifyCuenta';
 
 let actual = null;
 let cola = null; // { nombre, canciones, indice } cuando suena una playlist
@@ -21,8 +22,47 @@ function avisar() {
 
 export function reproducir(pista, { deCola = false } = {}) {
   if (!deCola) cola = null;
+  if (pista.fuente === 'spotify' && enModoApp()) {
+    const enApp = pista.tipo === 'track' ? { uris: [`spotify:track:${pista.id}`] } : { contexto: `spotify:${pista.tipo}:${pista.id}` };
+    mandarAApp(pista, enApp);
+    return;
+  }
   actual = pista;
   avisar();
+}
+
+// Modo "Sonar en mi Spotify": la app de Spotify suena (completo, con la pantalla apagada) y la página es el control.
+async function mandarAApp(pista, enApp) {
+  cola = null;
+  actual = { ...pista, fuente: 'app-enviando' };
+  avisar();
+  try {
+    await sonarEnApp(enApp);
+    actual = { ...pista, fuente: 'app' };
+  } catch (e) {
+    actual = {
+      ...pista,
+      fuente: 'app-error',
+      mensaje: e.message,
+      abrir: e instanceof SinDispositivo && pista.tipo ? linkApp(pista.tipo, pista.id) : '',
+    };
+  }
+  avisar();
+}
+
+// IDs de Spotify de una lista de canciones (busca las que no lo tienen, de a 5).
+async function idsDe(canciones) {
+  const ids = canciones.map((c) => c.spotifyId || '');
+  for (let i = 0; i < ids.length; i += 5) {
+    await Promise.all(
+      ids.slice(i, i + 5).map(async (id, k) => {
+        if (id) return;
+        const c = canciones[i + k];
+        ids[i + k] = (await cancionSpotify(c.titulo, c.artista).catch(() => null))?.id ?? '';
+      }),
+    );
+  }
+  return ids;
 }
 
 export function cerrarReproductor() {
@@ -35,6 +75,13 @@ export function cerrarReproductor() {
 // la busca en Spotify por título y artista. Devuelve el ID de Spotify si lo encontró.
 export async function reproducirCancion({ titulo, artista, spotifyId, videoId }, { deCola = false } = {}) {
   if (!deCola) cola = null;
+  if (enModoApp() && !deCola) {
+    const [id] = spotifyId ? [spotifyId] : await idsDe([{ titulo, artista }]);
+    if (id) {
+      mandarAApp({ tipo: 'track', id, titulo, artista }, { uris: [`spotify:track:${id}`] });
+      return id;
+    }
+  }
   if (spotifyId) {
     reproducir({ fuente: 'spotify', tipo: 'track', id: spotifyId, titulo, artista }, { deCola: true });
     return spotifyId;
@@ -69,8 +116,19 @@ function tocarActual() {
   reproducirCancion(c, { deCola: true });
 }
 
-export function reproducirCola(nombre, canciones, indice = 0) {
+export async function reproducirCola(nombre, canciones, indice = 0) {
   if (!canciones.length) return;
+  if (enModoApp()) {
+    // Toda la playlist va a la app: sigue tema tras tema aunque se apague la pantalla.
+    actual = { fuente: 'app-enviando', titulo: nombre, artista: '' };
+    cola = null;
+    avisar();
+    const ids = await idsDe(canciones);
+    const validos = ids.map((id, k) => ({ id, k })).filter((x) => x.id);
+    const offset = Math.max(0, validos.findIndex((x) => x.k >= indice));
+    mandarAApp({ titulo: nombre, artista: `${validos.length} temas` }, { uris: validos.map((x) => `spotify:track:${x.id}`), offset });
+    return;
+  }
   cola = { nombre, canciones, indice };
   tocarActual();
 }

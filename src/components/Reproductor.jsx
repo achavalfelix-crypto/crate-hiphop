@@ -1,5 +1,6 @@
-import { useEffect, useRef } from 'react';
-import { anterior, cerrarReproductor, siguiente, useCola, useReproductor } from '../services/reproductor';
+import { useEffect, useRef, useState } from 'react';
+import { anterior, cerrarReproductor, reproducir, siguiente, useCola, useReproductor } from '../services/reproductor';
+import { conectarSpotify, controlApp, linkApp, puedeControlar, setModoApp, useCuentaSpotify, useModoApp } from '../services/spotifyCuenta';
 
 // Carga una sola vez la API del reproductor de Spotify (permite cambiar de tema y darle play con un toque).
 let apiSpotify = null;
@@ -86,6 +87,78 @@ function YouTube({ pista }) {
   );
 }
 
+// Cuando suena en la app de Spotify, la barra es un control remoto.
+function ControlRemoto({ pista }) {
+  const [pausado, setPausado] = useState(false);
+  const [error, setError] = useState('');
+  const hacer = (f) => () => f().catch((e) => setError(e.message));
+  return (
+    <div className="control-remoto">
+      <p>
+        <span className="cs-punto" aria-hidden="true" /> Sonando en tu app de Spotify: <strong>{pista.titulo}</strong>
+        {pista.artista ? ` · ${pista.artista}` : ''}
+      </p>
+      <div className="cr-botones">
+        <button type="button" onClick={hacer(controlApp.anterior)} aria-label="Anterior">⏮</button>
+        <button
+          type="button"
+          onClick={hacer(async () => {
+            await (pausado ? controlApp.seguir() : controlApp.pausa());
+            setPausado(!pausado);
+          })}
+          aria-label={pausado ? 'Seguir' : 'Pausa'}
+        >
+          {pausado ? '▶' : '⏸'}
+        </button>
+        <button type="button" onClick={hacer(controlApp.siguiente)} aria-label="Siguiente">⏭</button>
+      </div>
+      {error && <p className="error" role="alert">{error}</p>}
+    </div>
+  );
+}
+
+// Elegir dónde suena: en la página (fragmentos si Safari no ve tu sesión) o en tu app (completo).
+function DondeSuena({ pista }) {
+  const cuenta = useCuentaSpotify();
+  const modoApp = useModoApp();
+  const abrir = pista.tipo && pista.id && pista.fuente === 'spotify' ? linkApp(pista.tipo, pista.id) : '';
+
+  if (modoApp) {
+    return (
+      <p className="donde-suena">
+        <button type="button" className="btn-texto" onClick={() => setModoApp(false)}>
+          Escuchar en la página
+        </button>
+      </p>
+    );
+  }
+  return (
+    <p className="donde-suena">
+      {cuenta && puedeControlar(cuenta) ? (
+        <button
+          type="button"
+          className="btn btn-spotify"
+          onClick={() => {
+            setModoApp(true);
+            if (pista.fuente === 'spotify') reproducir(pista);
+          }}
+        >
+          Escuchar completo en mi Spotify
+        </button>
+      ) : cuenta ? (
+        <button type="button" className="btn-texto" onClick={() => conectarSpotify()}>
+          Reconectá Spotify para escucharlo completo en tu app
+        </button>
+      ) : null}
+      {abrir && (
+        <a className="btn-texto" href={abrir} target="_blank" rel="noreferrer">
+          Abrir en la app de Spotify
+        </a>
+      )}
+    </p>
+  );
+}
+
 // Barra fija abajo: lo que está sonando en cualquier parte de la página.
 export default function Reproductor() {
   const pista = useReproductor();
@@ -135,8 +208,30 @@ export default function Reproductor() {
               No pudimos conectar con Spotify. Probá de nuevo en un rato.
             </p>
           )}
+          {pista.fuente === 'app-enviando' && (
+            <p className="reproductor-aviso" role="status">
+              Mandando “{pista.titulo}” a tu app de Spotify…
+            </p>
+          )}
+          {pista.fuente === 'app' && <ControlRemoto pista={pista} />}
+          {pista.fuente === 'app-error' && (
+            <div className="reproductor-aviso" role="alert">
+              <p>{pista.mensaje}</p>
+              <p className="donde-suena">
+                {pista.abrir && (
+                  <a className="btn btn-spotify" href={pista.abrir} target="_blank" rel="noreferrer">
+                    Abrir Spotify
+                  </a>
+                )}
+                <button type="button" className="btn-texto" onClick={() => setModoApp(false)}>
+                  Escuchar en la página
+                </button>
+              </p>
+            </div>
+          )}
           {esSpotify && <Spotify pista={pista} />}
           {pista.fuente === 'youtube' && <YouTube pista={pista} />}
+          {(esSpotify || pista.fuente === 'app') && <DondeSuena pista={pista} />}
         </div>
         <button type="button" className="reproductor-cerrar" onClick={cerrarReproductor} aria-label="Cerrar reproductor">
           ×

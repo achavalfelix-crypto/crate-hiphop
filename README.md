@@ -113,6 +113,12 @@ En Mi cajón → Playlists, el botón **Conectar Spotify** usa el inicio de sesi
 
 Mientras la app esté en modo desarrollador, Spotify solo deja usarlo a las cuentas anotadas en el panel (Settings → User Management, máximo 5). En el panel, en **Redirect URIs**, tienen que estar las direcciones exactas del sitio con barra final (por ejemplo `https://the-golden-era-archives.vercel.app/`); para probar en local, `http://127.0.0.1:5173/` (Spotify no acepta `localhost`).
 
+### Escuchar completo y con la pantalla apagada
+
+El reproductor embebido de Spotify pasa los temas completos solo si el navegador le deja ver tu sesión de Spotify. En la compu suele andar; en el iPhone, Safari la bloquea y quedan fragmentos de 30 segundos. Ninguna página puede seguir sonando con el celu bloqueado si la música sale de un reproductor embebido.
+
+Por eso, con Spotify conectado (y cuenta Premium, requisito de Spotify), el botón **Escuchar completo en mi Spotify** pasa al modo control remoto: cada ▶ manda la música a la app de Spotify (tema, disco, artista o la playlist entera en orden) y la barra de abajo queda con anterior, pausa y siguiente. La app suena completa y sigue con la pantalla apagada. Para cualquiera, **Abrir en la app de Spotify** abre el tema directo en la app.
+
 Sin cuenta de Spotify, el reproductor pasa fragmentos; con la cuenta abierta en el navegador, los temas completos.
 
 Las playlists se guardan en `users/{uid}/playlists/{playlistId}` con `nombre`, `descripcion` y `canciones` (hasta 100; cada una con título, artista, disco, año, costa, spotifyId y videoId).
@@ -174,5 +180,6 @@ firestore.rules          reglas de seguridad
 - **v10.0** — Reproductor propio de la página (Spotify y YouTube, sin salir del sitio), play en cada canción del cajón con búsqueda automática, favoritas con filtro, discos que se guardan con todas sus canciones y app instalable en el celular.
 - **v11.0** — Playlists: sugerencias, armado a mano, combinar, separar, cola de reproducción con anterior/siguiente y cada tema llevando a su disco. Ver HOJA-DE-RUTA.md para lo que sigue.
 - **v12.0** — Conectar Spotify (demo): guardar y actualizar playlists en la cuenta de Spotify de la persona y sumar a "Mi cajón" en Spotify cada canción que se guarda.
+- **v13.0** — Escuchar completo en la app de Spotify (control remoto con Spotify Connect, sigue con la pantalla apagada) y "Abrir en la app de Spotify" para todos.
 
 Las imágenes de artistas y tapas vienen de Wikipedia. Si no cargan, se muestra una portada generada con el color de la costa.

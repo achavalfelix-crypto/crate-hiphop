@@ -54,7 +54,7 @@ export default function Album({ id }) {
   const d = albumPorId(id);
   const { estado, datos } = useWiki(d?.wiki);
   const pista = useReproductor();
-  const girando = pista?.fuente === 'spotify' && pista.discoId === d?.id;
+  const girando = (pista?.fuente === 'spotify' || pista?.fuente === 'app') && pista.discoId === d?.id;
 
   if (!d) {
     return (

@@ -4,7 +4,8 @@
 import { useSyncExternalStore } from 'react';
 import { cancionSpotify } from './spotify';
 
-const ALCANCE = 'playlist-modify-private playlist-modify-public';
+// Playlists + manejar la app de Spotify como control remoto (para escuchar completo y con la pantalla apagada).
+const ALCANCE = 'playlist-modify-private playlist-modify-public user-modify-playback-state user-read-playback-state';
 const CLAVE = 'spotify-cuenta:v1';
 const CLAVE_CAJON = 'spotify-cuenta:playlist-cajon';
 const API = 'https://api.spotify.com/v1';
@@ -78,7 +79,7 @@ async function pedirToken(cuerpo) {
   });
   if (!r.ok) throw new Error('Spotify no aceptó la conexión.');
   const j = await r.json();
-  return { acceso: j.access_token, renovar: j.refresh_token, vence: Date.now() + j.expires_in * 1000 };
+  return { acceso: j.access_token, renovar: j.refresh_token, vence: Date.now() + j.expires_in * 1000, ...(j.scope ? { alcance: j.scope } : {}) };
 }
 
 // 2) Al volver de Spotify (la URL trae ?code=…): cambia el código por el permiso y limpia la URL.
@@ -138,6 +139,10 @@ async function api(ruta, { method = 'GET', body } = {}) {
     body: body ? JSON.stringify(body) : undefined,
   });
   if (r.status === 403) {
+    const cuerpo = await r.json().catch(() => ({}));
+    if (/PREMIUM/i.test(cuerpo?.error?.reason ?? '')) {
+      throw new Error('Para mandar la música a tu app, Spotify pide una cuenta Premium. Podés abrir el tema en la app con "Abrir en Spotify".');
+    }
     throw new Error(
       'Tu cuenta de Spotify no está habilitada en esta demo. Mientras la app esté en modo desarrollador, solo funciona para las cuentas que el dueño anotó (máximo 5).',
     );
@@ -213,3 +218,59 @@ export async function sumarAlCajonDeSpotify(spotifyId) {
   }
   await sumar(p.id);
 }
+
+// ── Control remoto: que suene en la app de Spotify del celu o la compu ──
+// Requiere Premium (regla de Spotify). La app sigue sonando con la pantalla apagada.
+export const puedeControlar = (c = cuenta) => Boolean(c?.alcance?.includes('user-modify-playback-state'));
+
+const CLAVE_MODO = 'spotify-cuenta:modo-app';
+let modoApp = (() => {
+  try {
+    return localStorage.getItem(CLAVE_MODO) === '1';
+  } catch {
+    return false;
+  }
+})();
+export function setModoApp(v) {
+  modoApp = v;
+  try {
+    localStorage.setItem(CLAVE_MODO, v ? '1' : '0');
+  } catch {
+    /* nada */
+  }
+  oyentes.forEach((f) => f());
+}
+export const enModoApp = () => modoApp && puedeControlar();
+export function useModoApp() {
+  return useSyncExternalStore(
+    (f) => (oyentes.add(f), () => oyentes.delete(f)),
+    () => modoApp && puedeControlar(),
+  );
+}
+
+export class SinDispositivo extends Error {}
+
+// Manda a sonar: { uris: [...], offset } para temas sueltos o una cola, o { contexto } para disco/artista/playlist.
+export async function sonarEnApp({ uris, contexto, offset = 0 }) {
+  const cuerpo = contexto ? { context_uri: contexto } : { uris: uris.slice(0, 100), offset: { position: Math.min(offset, 99) } };
+  try {
+    await api('/me/player/play', { method: 'PUT', body: cuerpo });
+  } catch (e) {
+    if (!/404/.test(e.message)) throw e;
+    // No hay ningún Spotify activo: si hay uno abierto en algún dispositivo, lo usamos.
+    const { devices = [] } = (await api('/me/player/devices')) ?? {};
+    const d = devices.find((x) => x.type === 'Smartphone') ?? devices[0];
+    if (!d) throw new SinDispositivo('Abrí la app de Spotify en tu celu y volvé a tocar ▶.');
+    await api(`/me/player/play?device_id=${d.id}`, { method: 'PUT', body: cuerpo });
+  }
+}
+
+export const controlApp = {
+  siguiente: () => api('/me/player/next', { method: 'POST' }),
+  anterior: () => api('/me/player/previous', { method: 'POST' }),
+  pausa: () => api('/me/player/pause', { method: 'PUT' }),
+  seguir: () => api('/me/player/play', { method: 'PUT' }),
+};
+
+// Link que abre el tema, disco o playlist directo en la app de Spotify (sirve para cualquiera).
+export const linkApp = (tipo, id) => `https://open.spotify.com/${tipo}/${id}`;
