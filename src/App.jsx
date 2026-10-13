@@ -1,6 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import AlbumForm from './components/AlbumForm';
 import AlbumList from './components/AlbumList';
+import Aviso from './components/Aviso';
+import Filtros from './components/Filtros';
+import { normalizar } from './data/constantes';
 import {
   actualizarAlbum,
   agregarAlbum,
@@ -13,7 +16,9 @@ export default function App() {
   const [uid, setUid] = useState(null);
   const [albums, setAlbums] = useState([]);
   const [cargando, setCargando] = useState(true);
-  const [mensaje, setMensaje] = useState(null);
+  const [errorCarga, setErrorCarga] = useState(null);
+  const [aviso, setAviso] = useState(null);
+  const [filtros, setFiltros] = useState({ costa: '', estado: '' });
 
   useEffect(() => {
     let cortar = () => {};
@@ -23,62 +28,98 @@ export default function App() {
         cortar = escucharAlbums(
           id,
           (datos) => {
-            setAlbums(datos);
+            setAlbums(datos.map(normalizar));
             setCargando(false);
           },
           () => {
-            setMensaje({ tipo: 'error', texto: 'No se pudieron cargar los discos.' });
+            setErrorCarga('No se pudieron cargar los discos. Revisá la conexión y recargá la página.');
             setCargando(false);
           },
         );
       })
       .catch(() => {
-        setMensaje({ tipo: 'error', texto: 'No se pudo conectar con Firebase.' });
+        setErrorCarga('No se pudo conectar con Firebase. Revisá la configuración del proyecto.');
         setCargando(false);
       });
     return () => cortar();
   }, []);
 
-  async function ejecutar(promesa, exito, error) {
+  // Ejecuta una operación de Firestore y muestra el resultado. Devuelve true si salió bien.
+  async function ejecutar(operacion, exito, error) {
     try {
-      await promesa;
-      setMensaje({ tipo: 'ok', texto: exito });
-    } catch {
-      setMensaje({ tipo: 'error', texto: error });
+      await operacion();
+      setAviso({ tipo: 'ok', texto: exito });
+      return true;
+    } catch (err) {
+      console.error(err);
+      setAviso({ tipo: 'error', texto: error });
+      return false;
     }
   }
 
+  const cerrarAviso = useCallback(() => setAviso(null), []);
+
+  const visibles = useMemo(
+    () =>
+      albums.filter(
+        (a) =>
+          (!filtros.costa || a.coast === filtros.costa) &&
+          (!filtros.estado || a.status === filtros.estado),
+      ),
+    [albums, filtros],
+  );
+
   return (
     <main className="app">
-      <h1>Crate</h1>
-      <p>Rap gangster de Estados Unidos, 1980–2016</p>
+      <header>
+        <h1>Crate</h1>
+        <p>Rap gangster de Estados Unidos, 1980–2016</p>
+      </header>
 
-      {mensaje && <p className={`mensaje ${mensaje.tipo}`}>{mensaje.texto}</p>}
-
-      <AlbumForm
-        deshabilitado={!uid}
-        onAgregar={(datos) =>
-          ejecutar(agregarAlbum(uid, datos), 'Disco agregado.', 'No se pudo agregar el disco.')
-        }
-      />
-
-      {cargando ? (
-        <p>Cargando discos…</p>
-      ) : (
-        <AlbumList
-          albums={albums}
-          onCambiarEstado={(a) =>
+      <section aria-labelledby="titulo-agregar">
+        <h2 id="titulo-agregar">Agregar disco</h2>
+        <AlbumForm
+          deshabilitado={!uid}
+          onGuardar={(datos) =>
             ejecutar(
-              actualizarAlbum(uid, a.id, { escuchado: !a.escuchado }),
-              'Estado actualizado.',
-              'No se pudo actualizar.',
+              () => agregarAlbum(uid, { ...datos, status: 'pendiente', rating: 0, tracks: [] }),
+              `“${datos.title}” agregado.`,
+              'No se pudo agregar el disco. Probá de nuevo.',
             )
           }
-          onEliminar={(a) =>
-            ejecutar(eliminarAlbum(uid, a.id), 'Disco eliminado.', 'No se pudo eliminar.')
-          }
         />
-      )}
+      </section>
+
+      <section aria-labelledby="titulo-discos">
+        <h2 id="titulo-discos">Tus discos</h2>
+        <Filtros filtros={filtros} onCambiar={setFiltros} />
+        {cargando ? (
+          <p className="cargando">Cargando discos…</p>
+        ) : errorCarga ? (
+          <p className="error">{errorCarga}</p>
+        ) : (
+          <AlbumList
+            albums={visibles}
+            hayFiltros={Boolean(filtros.costa || filtros.estado)}
+            onActualizar={(album, cambios) =>
+              ejecutar(
+                () => actualizarAlbum(uid, album, cambios),
+                'Cambios guardados.',
+                'No se pudieron guardar los cambios.',
+              )
+            }
+            onEliminar={(album) =>
+              ejecutar(
+                () => eliminarAlbum(uid, album.id),
+                `“${album.title}” eliminado.`,
+                'No se pudo eliminar el disco.',
+              )
+            }
+          />
+        )}
+      </section>
+
+      <Aviso aviso={aviso} onCerrar={cerrarAviso} />
     </main>
   );
 }

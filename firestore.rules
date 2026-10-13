@@ -1,9 +1,32 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Cada usuario (anónimo) solo puede leer y escribir sus propios discos.
+
+    // Cada usuario (anónimo) solo puede ver y modificar sus propios discos.
     match /users/{userId}/albums/{albumId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      function esDueno() {
+        return request.auth != null && request.auth.uid == userId;
+      }
+
+      // Valida forma y valores del disco antes de guardarlo.
+      function albumValido(d) {
+        return d.keys().hasOnly(['title', 'artist', 'year', 'coast', 'status', 'rating', 'tracks', 'createdAt', 'updatedAt'])
+          && d.title is string && d.title.size() > 0 && d.title.size() <= 120
+          && d.artist is string && d.artist.size() > 0 && d.artist.size() <= 80
+          && d.year is int && d.year >= 1980 && d.year <= 2016
+          && d.coast in ['west', 'east', 'south', 'midwest']
+          && d.status in ['pendiente', 'escuchando', 'escuchado']
+          && d.rating is int && d.rating >= 0 && d.rating <= 5
+          && d.tracks is list && d.tracks.size() <= 60;
+      }
+
+      allow read, delete: if esDueno();
+      allow create, update: if esDueno() && albumValido(request.resource.data);
+    }
+
+    // Todo lo demás queda cerrado.
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }

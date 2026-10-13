@@ -1,36 +1,167 @@
+* {
+  box-sizing: border-box;
+}
 body {
   font-family: system-ui, sans-serif;
   margin: 0;
-  padding: 24px;
+  padding: 16px;
+  background: #f6f6f6;
+  color: #222;
 }
 .app {
-  max-width: 640px;
+  max-width: 760px;
   margin: 0 auto;
+}
+h2 {
+  font-size: 1.1rem;
+  margin: 32px 0 12px;
+}
+.btn {
+  padding: 8px 12px;
+  border: 1px solid #bbb;
+  background: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  font: inherit;
+}
+.btn-primario {
+  background: #222;
+  color: #fff;
+  border-color: #222;
+}
+.btn-peligro {
+  color: #b00020;
+}
+.btn-icono {
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+}
+input,
+select {
+  font: inherit;
+  padding: 8px;
+  border: 1px solid #bbb;
+  border-radius: 4px;
+  width: 100%;
 }
 .form {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 24px;
+  gap: 12px;
+  align-items: flex-start;
 }
-.form input {
-  flex: 1 1 140px;
-  padding: 8px;
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1 1 180px;
+}
+.campo-corto {
+  flex: 0 1 140px;
+}
+.acciones-form {
+  display: flex;
+  gap: 8px;
+  align-self: flex-end;
+}
+.error {
+  color: #b00020;
+}
+.filtros {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.filtros label {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.9rem;
 }
 .lista {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
-.lista li {
+.album {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 8px;
+}
+.album-principal {
   display: flex;
-  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+.album-datos {
+  flex: 1 1 220px;
+}
+.album-datos h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+.album-datos p {
+  margin: 2px 0 0;
+  color: #666;
+}
+.album-principal select {
+  width: auto;
+}
+.album-acciones {
+  display: flex;
+  flex-wrap: wrap;
   gap: 8px;
-  padding: 8px 0;
-  border-bottom: 1px solid #ddd;
+  margin-top: 10px;
 }
-.mensaje.ok {
-  color: green;
+.puntaje .estrella {
+  border: 0;
+  background: none;
+  font-size: 1.2rem;
+  color: #ccc;
+  cursor: pointer;
 }
-.mensaje.error {
-  color: crimson;
+.puntaje .estrella.llena {
+  color: #e0a800;
+}
+.canciones ol {
+  padding-left: 20px;
+}
+.canciones li {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.cancion-titulo {
+  flex: 1;
+}
+.form-cancion {
+  display: flex;
+  gap: 8px;
+}
+.aviso-zona {
+  position: fixed;
+  bottom: 16px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+.aviso {
+  padding: 10px 16px;
+  border-radius: 4px;
+  color: #fff;
+  background: #2e7d32;
+}
+.aviso-error {
+  background: #b00020;
+}
+@media (max-width: 600px) {
+  .filtros {
+    flex-direction: column;
+  }
 }
