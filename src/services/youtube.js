@@ -51,3 +51,16 @@ const numero = new Intl.NumberFormat('es-AR');
 export const formatoVistas = (n) => numero.format(n);
 
 export const linkEscuchar = (id) => `https://music.youtube.com/watch?v=${id}`;
+
+// Busca el video de una canción ("artista - título") y devuelve su ID, o '' si no hay.
+// Cuesta 100 unidades de la cuota diaria (10.000 gratis): se usa una vez por canción y el ID queda guardado.
+export async function buscarVideo(titulo, artista) {
+  const q = encodeURIComponent(`${artista} ${titulo}`);
+  const url =
+    'https://www.googleapis.com/youtube/v3/search?part=id&type=video&videoCategoryId=10&maxResults=1' +
+    `&q=${q}&key=${KEY}`;
+  const res = await fetch(url);
+  if (!res.ok) throw Object.assign(new Error(`YouTube respondió ${res.status}`), { estado: res.status });
+  const json = await res.json();
+  return json.items?.[0]?.id?.videoId ?? '';
+}

@@ -11,6 +11,7 @@ import LineaDeTiempo from '../components/LineaDeTiempo';
 import { CATALOGO } from '../data/catalogo';
 import { normalizar } from '../data/constantes';
 import { prepararImportacion } from '../data/importar';
+import useVideosFaltantes from '../hooks/useVideosFaltantes';
 import useYouTube from '../hooks/useYouTube';
 import { firebaseConfigurado } from '../firebase';
 import {
@@ -147,6 +148,7 @@ export default function Cajon() {
     [albums],
   );
   const youtube = useYouTube(videoIds);
+  useVideosFaltantes(uid, albums);
   const vacio = !cargando && !errorCarga && albums.length === 0;
 
   return (

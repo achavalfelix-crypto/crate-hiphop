@@ -195,5 +195,6 @@ firestore.rules          reglas de seguridad
 - **v15.0** — Mi cajón rediseñado: tarjetas con tapa real, historia corta de los discos del archivo, agregar buscando en Spotify, línea de tiempo y filtros más simples.
 - **v16.0** — Álbumes en un solo pedido (las 26 discografías juntas, guardadas una semana en Vercel para no gastar la cuota de Spotify), solo discos hasta 2016, tapas guardadas en cada disco del cajón y canciones de un disco rediseñadas con "Traer todas las canciones de Spotify".
 - **v17.0** — Discografías guardadas en la página (`public/datos/`): Álbumes, las discografías de cada artista y las canciones de los discos se leen de ahí y Spotify en vivo queda solo para lo que falta. Script `scripts/discografias.mjs` y acción de GitHub para generarlas.
+- **v17.1** — Reproducciones de YouTube también para lo que se suma desde Spotify: el cajón busca una vez el video de cada canción sin link (hasta 20 por visita, para cuidar la cuota de 10.000 unidades diarias), lo guarda en `videoId` y desde ahí muestra duración y reproducciones en vivo.
 
 Las imágenes de artistas y tapas vienen de Wikipedia. Si no cargan, se muestra una portada generada con el color de la costa.
