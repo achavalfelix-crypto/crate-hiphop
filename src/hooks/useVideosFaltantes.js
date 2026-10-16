@@ -81,8 +81,9 @@ export default function useVideosFaltantes(uid, albums) {
           const tracks = a.tracks.map((t) =>
             !t.videoId && porTema[normalTema(t.title)] ? { ...t, videoId: porTema[normalTema(t.title)] } : t,
           );
-          // Las que no estaban en la lista: de a una, mientras quede lugar en esta visita.
-          for (let i = 0; i < tracks.length; i++) {
+          // Las que no estaban en la lista: de a una, solo si son pocas (si no, un disco se come la cuota).
+          const restan = tracks.filter((t) => !t.videoId && !sin.has(clave(a.artist, t.title))).length;
+          for (let i = 0; restan <= 3 && i < tracks.length; i++) {
             const t = tracks[i];
             if (t.videoId || sin.has(clave(a.artist, t.title))) continue;
             if (busquedas.current >= BUSQUEDAS_POR_VISITA) break;

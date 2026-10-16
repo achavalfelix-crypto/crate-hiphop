@@ -197,5 +197,6 @@ firestore.rules          reglas de seguridad
 - **v17.0** — Discografías guardadas en la página (`public/datos/`): Álbumes, las discografías de cada artista y las canciones de los discos se leen de ahí y Spotify en vivo queda solo para lo que falta. Script `scripts/discografias.mjs` y acción de GitHub para generarlas.
 - **v17.1** — Reproducciones de YouTube también para lo que se suma desde Spotify: el cajón busca una vez el video de cada canción sin link (hasta 20 por visita, para cuidar la cuota de 10.000 unidades diarias), lo guarda en `videoId` y desde ahí muestra duración y reproducciones en vivo.
 - **v17.2** — Las reproducciones rinden más con la cuota de YouTube: un disco se resuelve con una sola búsqueda (la lista del álbum en YouTube Music), va primero lo último que agregaste y, si la cuota del día se terminó, el cajón lo avisa.
+- **v17.3** — Si un disco no tiene lista en YouTube Music, sus canciones se buscan de a una solo cuando faltan 3 o menos, para que un disco no se gaste la cuota de todos.
 
 Las imágenes de artistas y tapas vienen de Wikipedia. Si no cargan, se muestra una portada generada con el color de la costa.
