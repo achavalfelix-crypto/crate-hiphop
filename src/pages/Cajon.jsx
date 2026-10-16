@@ -148,7 +148,7 @@ export default function Cajon() {
     [albums],
   );
   const youtube = useYouTube(videoIds);
-  useVideosFaltantes(uid, albums);
+  const cuotaYouTube = useVideosFaltantes(uid, albums);
   const vacio = !cargando && !errorCarga && albums.length === 0;
 
   return (
@@ -168,6 +168,11 @@ export default function Cajon() {
       </header>
 
       <TabsCajon activa="coleccion" />
+      {cuotaYouTube === 'sin-cuota' && (
+        <p className="nota-fuente">
+          Por hoy se terminaron las búsquedas gratis de YouTube: las reproducciones de lo que agregues aparecen mañana.
+        </p>
+      )}
 
       <section className="seccion-linea" aria-label="Línea de tiempo por año">
         <LineaDeTiempo

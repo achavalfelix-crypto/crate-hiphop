@@ -64,3 +64,45 @@ export async function buscarVideo(titulo, artista) {
   const json = await res.json();
   return json.items?.[0]?.id?.videoId ?? '';
 }
+
+// Un disco entero con UNA búsqueda: busca la lista del álbum (las que arma YouTube Music para cada disco)
+// y devuelve { [título normalizado]: videoId } con las canciones que coinciden.
+// Cuesta ~101 unidades en vez de 100 por canción.
+const normalTema = (t) =>
+  (t ?? '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s*[([].*?[)\]]/g, '')
+    .replace(/\s+-\s+.*$/, '')
+    .replace(/[^a-z0-9]/g, '');
+export { normalTema };
+
+export async function buscarVideosDelDisco(disco, artista, temas) {
+  const q = encodeURIComponent(`${artista} ${disco} album`);
+  const res = await fetch(
+    `https://www.googleapis.com/youtube/v3/search?part=id&type=playlist&maxResults=3&q=${q}&key=${KEY}`,
+  );
+  if (!res.ok) throw Object.assign(new Error(`YouTube respondió ${res.status}`), { estado: res.status });
+  const listas = ((await res.json()).items ?? []).map((x) => x.id?.playlistId).filter(Boolean);
+  const buscados = temas.map(normalTema).filter((t) => t.length >= 2);
+  let mejor = {};
+  for (const id of listas) {
+    const r = await fetch(
+      `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${id}&key=${KEY}`,
+    );
+    if (!r.ok) continue;
+    const encontrados = {};
+    for (const it of (await r.json()).items ?? []) {
+      const vid = it.snippet?.resourceId?.videoId;
+      const t = normalTema(it.snippet?.title);
+      if (!vid || !t) continue;
+      const tema = buscados.find((b) => b === t) ?? buscados.find((b) => b.length >= 4 && (t.includes(b) || b.includes(t)));
+      if (tema && !encontrados[tema]) encontrados[tema] = vid;
+    }
+    if (Object.keys(encontrados).length > Object.keys(mejor).length) mejor = encontrados;
+    // Si la lista tiene al menos la mitad del disco, es esa.
+    if (Object.keys(mejor).length >= Math.ceil(buscados.length / 2)) break;
+  }
+  return mejor;
+}
