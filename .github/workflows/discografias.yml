@@ -1,0 +1,33 @@
+# Actualiza las discografías guardadas en public/datos/ (ver scripts/discografias.mjs).
+# Se corre a mano desde GitHub: pestaña Actions → "Actualizar discografías" → Run workflow.
+name: Actualizar discografías
+
+on:
+  workflow_dispatch:
+    inputs:
+      forzar:
+        description: 'Volver a bajar todo (si no, solo completa lo que falta)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  actualizar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Bajar discografías
+        run: node scripts/discografias.mjs ${{ inputs.forzar && '--forzar' || '' }}
+      - name: Guardar en el repo
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git add public/datos
+          git diff --cached --quiet || (git commit -m "Discografías guardadas ($(date +%F))" && git push)

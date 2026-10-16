@@ -1,5 +1,7 @@
 // Datos de Spotify a través de nuestra función /api/spotify (la clave nunca llega al navegador).
 // Guarda las respuestas en sessionStorage para no repetir pedidos en la misma visita.
+import { albumLocal, artistaLocalSpotify, discografiaLocal, discoLocal, todasLocales } from './archivoLocal';
+
 const PREFIJO = 'spotify:v1:';
 const enCurso = new Map();
 
@@ -28,18 +30,20 @@ async function pedir(params) {
   return promesa;
 }
 
-export const albumSpotify = (titulo, artista, anio) =>
-  pedir({ tipo: 'album', titulo, artista, ...(anio ? { anio: String(anio) } : {}) });
+// Primero se busca en las discografías guardadas en la página (services/archivoLocal.js);
+// Spotify en vivo solo se usa para lo que no está guardado.
+export const albumSpotify = async (titulo, artista, anio) =>
+  (await albumLocal(titulo, artista, anio)) ?? pedir({ tipo: 'album', titulo, artista, ...(anio ? { anio: String(anio) } : {}) });
 
-export const artistaSpotify = (nombre) => pedir({ tipo: 'artista', nombre });
+export const artistaSpotify = async (nombre) => (await artistaLocalSpotify(nombre)) ?? pedir({ tipo: 'artista', nombre });
 
 export const cancionSpotify = (titulo, artista) => pedir({ tipo: 'cancion', titulo, artista });
 
-export const discoSpotify = (id) => pedir({ tipo: 'disco', id });
+export const discoSpotify = async (id) => (await discoLocal(id)) ?? pedir({ tipo: 'disco', id });
 
-export const discografiaSpotify = (nombre) => pedir({ tipo: 'discografia', nombre });
+export const discografiaSpotify = async (nombre) => (await discografiaLocal(nombre)) ?? pedir({ tipo: 'discografia', nombre });
 
-export const todasLasDiscografias = () => pedir({ tipo: 'todos' });
+export const todasLasDiscografias = async () => (await todasLocales()) ?? pedir({ tipo: 'todos' });
 
 export const buscarDiscosSpotify = (q) => pedir({ tipo: 'buscar', q });
 

@@ -104,6 +104,15 @@ La página usa Spotify sin pedirle a nadie que inicie sesión, así la puede usa
 1. En [developer.spotify.com/dashboard](https://developer.spotify.com/dashboard) creá una app con la Web API (la cuenta dueña necesita Premium).
 2. Copiá el Client ID y el Client Secret a Vercel (Settings → Environment Variables) como `SPOTIFY_CLIENT_ID` y `SPOTIFY_CLIENT_SECRET`, y también a tu `.env` para probar en local.
 
+### Discografías guardadas (no depender de Spotify)
+
+Las discografías de los 26 artistas y las canciones de cada disco se guardan en la propia página, en `public/datos/discografias.json` y `public/datos/discos.json`. La página lee primero esos archivos y solo le pregunta a Spotify lo que no está ahí (por ejemplo, el buscador). Así Álbumes y las fichas muestran siempre la discografía completa, aunque Spotify esté lento o sin cuota.
+
+Los archivos los genera `scripts/discografias.mjs`, que le pide los datos a la página publicada una sola vez, despacio y reintentando si Spotify pide esperar. Si se corta, se vuelve a correr y retoma. Dos formas:
+
+- **Desde GitHub (sin instalar nada):** pestaña **Actions → Actualizar discografías → Run workflow**. Al terminar sube los archivos al repo y Vercel publica solo.
+- **Desde la compu:** `npm run discografias`, y después `git add public/datos`, commit y push. Con `--forzar` vuelve a bajar todo.
+
 ### Conectar Spotify (demo, hasta 5 cuentas)
 
 En Mi cajón → Playlists, el botón **Conectar Spotify** usa el inicio de sesión oficial para páginas web (Authorization Code con PKCE): no hay secreto en el navegador y el permiso queda guardado en ese navegador. Con la cuenta conectada:
@@ -185,5 +194,6 @@ firestore.rules          reglas de seguridad
 - **v14.1** — La lista de Álbumes muestra todos los discos de todos los artistas (no solo los 24 del archivo), con filtros por costa, artista y nombre.
 - **v15.0** — Mi cajón rediseñado: tarjetas con tapa real, historia corta de los discos del archivo, agregar buscando en Spotify, línea de tiempo y filtros más simples.
 - **v16.0** — Álbumes en un solo pedido (las 26 discografías juntas, guardadas una semana en Vercel para no gastar la cuota de Spotify), solo discos hasta 2016, tapas guardadas en cada disco del cajón y canciones de un disco rediseñadas con "Traer todas las canciones de Spotify".
+- **v17.0** — Discografías guardadas en la página (`public/datos/`): Álbumes, las discografías de cada artista y las canciones de los discos se leen de ahí y Spotify en vivo queda solo para lo que falta. Script `scripts/discografias.mjs` y acción de GitHub para generarlas.
 
 Las imágenes de artistas y tapas vienen de Wikipedia. Si no cargan, se muestra una portada generada con el color de la costa.
